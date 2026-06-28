@@ -6,8 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
 # 1. إعداد قاعدة البيانات وتوليد الملف تلقائياً
-SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:كلمة_المرور_الحقيقية_هنا@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:npg_EDprP1fHxR5n@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -69,7 +69,7 @@ def get_announcements(db: Session = Depends(get_db)):
 @app.post("/announcements", dependencies=[Depends(verify_token)])
 def add_announcement(content: str, db: Session = Depends(get_db)):
     new_ann = Announcement(content=content)
-    db.add(new_ann)
+    db.add(new_ann) 
     db.commit()
     return {"status": "success"}
 
