@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
 # 1. إعداد قاعدة البيانات وتوليد الملف تلقائياً
-DATABASE_URL = "sqlite:///./eduhub_v2.db"
+SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:كلمة_المرور_الحقيقية_هنا@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
