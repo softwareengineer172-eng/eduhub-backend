@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from fastapi import FastAPI, Depends, HTTPException, status, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -33,6 +34,38 @@ class StudentGrade(Base):
     course_name = Column(String(100), nullable=False)
     theory_grade = Column(Float, default=0.0)
     practical_grade = Column(Float, default=0.0)
+
+class DailyAgenda(Base):
+    __tablename__ = "daily_agenda"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    lecture_1 = Column(String(100), nullable=False)
+    time_1 = Column(String(50), nullable=False)
+    lecture_2 = Column(String(100), nullable=False)
+    time_2 = Column(String(50), nullable=False)
+    status_msg = Column(String(100), nullable=False) # مثل: لا توجد اختبارات أو تسليمات
+
+class UpcomingExam(Base):
+    __tablename__ = "upcoming_exams"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    course_name = Column(String(100), nullable=False)
+    exam_date_text = Column(String(100), nullable=False) # مثل: الخميس, 30 يوليو 2026
+    exam_time = Column(String(50), nullable=False) # مثل: 09:00 صباحاً
+    timestamp = Column(String(100), nullable=False) # لبرمجة المؤقت: 2026-07-30T09:00:00
+
+class AgendaCreate(BaseModel):
+    lecture_1: str
+    time_1: str
+    lecture_2: str
+    time_2: str
+    status_msg: str
+
+class ExamCreate(BaseModel):
+    course_name: str
+    exam_date_text: str
+    exam_time: str
+    timestamp: str
+
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -100,3 +133,31 @@ def remove_student(student_id: int, db: Session = Depends(get_db)):
     db.query(StudentGrade).filter(StudentGrade.id == student_id).delete()
     db.commit()
     return {"status": "success"}
+
+# -- قسم الأجندة اليومية --
+@app.get("/agenda/")
+def get_agenda(db: Session = Depends(get_db)):
+    # جلب أحدث أجندة فقط (آخر صف تم إضافته)
+    return db.query(DailyAgenda).order_by(DailyAgenda.id.desc()).first()
+
+@app.post("/agenda/")
+def create_agenda(agenda: AgendaCreate, db: Session = Depends(get_db), token: str = Depends(verify_token)):
+    new_agenda = DailyAgenda(**agenda.dict())
+    db.add(new_agenda)
+    db.commit()
+    db.refresh(new_agenda)
+    return new_agenda
+
+# -- قسم الاختبار القادم --
+@app.get("/exam/")
+def get_exam(db: Session = Depends(get_db)):
+    # جلب أحدث اختبار تم رفعه
+    return db.query(UpcomingExam).order_by(UpcomingExam.id.desc()).first()
+
+@app.post("/exam/")
+def create_exam(exam: ExamCreate, db: Session = Depends(get_db), token: str = Depends(verify_token)):
+    new_exam = UpcomingExam(**exam.dict())
+    db.add(new_exam)
+    db.commit()
+    db.refresh(new_exam)
+    return new_exam

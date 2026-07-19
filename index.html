@@ -1,18 +1,176 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduHub v2.0 - بوابة هندسة البرمجيات المؤمنة</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap'); body{font-family:'Tajawal',sans-serif;}</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        /* ========================================= */
+        /* تنسيقات لوحة تحكم المندوب (تصميم زجاجي نيون) */
+        /* ========================================= */
+
+        /* الحاوية الرئيسية للبطاقات */
+        .admin-panel-section {
+            background: rgba(30, 41, 59, 0.7); /* لون داكن مع شفافية زجاجية */
+            padding: 25px 30px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            max-width: 650px;
+            margin: 0 auto 35px auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .admin-panel-section:hover {
+            transform: translateY(-3px);
+        }
+
+        /* تأثير الإضاءة العلوية الذكية لإبراز البطاقة */
+        .admin-panel-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8); /* تدرج أزرق للأجندة */
+        }
+
+        .admin-panel-section.exam-section::before {
+            background: linear-gradient(90deg, #ef4444, #f97316); /* تدرج أحمر/برتقالي للاختبارات */
+        }
+
+        /* تنسيق العناوين داخل البطاقات */
+        .admin-panel-section h2 {
+            color: #f8fafc;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            padding-bottom: 15px;
+        }
+
+        .admin-panel-section h2 i {
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .admin-panel-section.exam-section h2 i {
+            color: #ef4444;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* ترتيب الحقول المزدوجة (للمحاضرات والأوقات) */
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        /* استجابة الحقول للشاشات الصغيرة (الجوال) */
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        /* تصميم حقول الإدخال (الأنبوت) */
+        .admin-panel-section input {
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+        /* تأثير النيون عند الكتابة داخل الحقل */
+        .admin-panel-section input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            background: #1e293b;
+        }
+
+        .admin-panel-section.exam-section input:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* تنسيق النصوص التوضيحية (Labels) */
+        .admin-panel-section label {
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        /* الأزرار الاحترافية (Gradient Buttons) */
+        .admin-btn {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05em;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+            margin-top: 10px;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        /* زر الاختبار (أحمر تنبيهي) */
+        .alert-btn {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+        }
+
+        .alert-btn:hover {
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+            background: linear-gradient(135deg, #b91c1c, #dc2626);
+        }
+    </style>
 </head>
+
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
     <!-- شريط الإشعارات العلوي الذكي المتحرك -->
-    <div class="bg-gradient-to-r from-teal-500 to-indigo-600 text-slate-950 text-center py-2 px-4 text-xs font-bold shadow-md">
-        <i class="fa-solid fa-shield-halved animate-pulse ml-2"></i> <span id="notificationBar">تنبيه أمني: تم تشفير المنظومة وربط قفل لوحة التحكم الخاص بالمندوب بنجاح!</span>
+    <div
+        class="bg-gradient-to-r from-teal-500 to-indigo-600 text-slate-950 text-center py-2 px-4 text-xs font-bold shadow-md">
+        <i class="fa-solid fa-shield-halved animate-pulse ml-2"></i> <span id="notificationBar">تنبيه أمني: تم تشفير
+            المنظومة وربط قفل لوحة التحكم الخاص بالمندوب بنجاح!</span>
     </div>
 
     <!-- شريط القيادة العلوي -->
@@ -20,9 +178,11 @@
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
                 <i class="fa-solid fa-terminal text-2xl text-teal-400"></i>
-                <span class="text-xl font-bold tracking-wider text-white">EduHub <span class="text-xs text-teal-400 font-mono">Secured v2.0</span></span>
+                <span class="text-xl font-bold tracking-wider text-white">EduHub <span
+                        class="text-xs text-teal-400 font-mono">Secured v2.0</span></span>
             </div>
-            <button onclick="promptAdminAccess()" class="text-xs bg-indigo-950 hover:bg-indigo-900 border border-indigo-700 px-4 py-2 rounded-xl text-teal-300 font-bold transition shadow-sm">
+            <button onclick="promptAdminAccess()"
+                class="text-xs bg-indigo-950 hover:bg-indigo-900 border border-indigo-700 px-4 py-2 rounded-xl text-teal-300 font-bold transition shadow-sm">
                 <i class="fa-solid fa-lock-open ml-1"></i> بوابتي الأمنية (المندوب)
             </button>
         </div>
@@ -31,7 +191,8 @@
     <!-- الهيدر الرئيسي الفخم -->
     <header class="max-w-7xl mx-auto px-4 pt-10 pb-6 text-center">
         <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">البوابة الأكاديمية الشاملة لدفعة هندسة البرمجيات</h1>
-        <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">تطوير وتنسيق وتأمين المندوب المطور: <span class="text-teal-400 font-bold">أيمن جران</span></p>
+        <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">تطوير وتنسيق وتأمين المندوب المطور: <span
+                class="text-teal-400 font-bold">أيمن جران</span></p>
     </header>
 
     <!-- المحتوى الرئيسي للموقع -->
@@ -39,13 +200,15 @@
         <!-- لوحة الإعلانات والملفات الجانبية -->
         <div class="space-y-6 lg:col-span-1">
             <section class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-amber-400 font-bold text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-bullhorn"></i> آخر التعميمات والإعلانات</h3>
+                <h3 class="text-amber-400 font-bold text-sm mb-3 flex items-center gap-2"><i
+                        class="fa-solid fa-bullhorn"></i> آخر التعميمات والإعلانات</h3>
                 <div id="announcementsContainer" class="space-y-2.5 text-xs text-slate-300 max-h-60 overflow-y-auto">
                     <p class="text-slate-500 italic">لا توجد إعلانات معروضة حالياً.</p>
                 </div>
             </section>
             <section class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-teal-400 font-bold text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-folder-open"></i> أحدث الملفات المرفوعة</h3>
+                <h3 class="text-teal-400 font-bold text-sm mb-3 flex items-center gap-2"><i
+                        class="fa-solid fa-folder-open"></i> أحدث الملفات المرفوعة</h3>
                 <div id="latestFilesContainer" class="space-y-2 text-xs max-h-60 overflow-y-auto">
                     <p class="text-slate-500 italic">لا توجد ملفات جديدة مرفوعة مؤخراً.</p>
                 </div>
@@ -55,7 +218,8 @@
         <!-- كشوفات الدرجات والمواد الدراسية الثمانية المعتمدة -->
         <div class="lg:col-span-3 space-y-8">
             <section class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i class="fa-solid fa-square-poll-horizontal text-indigo-400"></i> كشوفات درجات الطلاب العامة</h3>
+                <h3 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i
+                        class="fa-solid fa-square-poll-horizontal text-indigo-400"></i> كشوفات درجات الطلاب العامة</h3>
                 <div class="overflow-x-auto rounded-xl border border-slate-800">
                     <table class="w-full text-right border-collapse text-xs md:text-sm">
                         <thead>
@@ -67,28 +231,37 @@
                             </tr>
                         </thead>
                         <tbody id="gradesTableBody" class="divide-y divide-slate-800/50 text-slate-300">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-500 italic">جاري تحميل البيانات...</td></tr>
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-slate-500 italic">جاري تحميل البيانات...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
             <section>
-                <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-cubes text-teal-400"></i> المقررات الدراسية الحالية</h3>
+                <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-cubes text-teal-400"></i> المقررات الدراسية الحالية</h3>
                 <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
         </div>
     </main>
 
     <!-- لوحة التحكم الإدارية والأمنية الكبرى للمندوب ايمن جران -->
-    <div id="adminModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleAdminModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold text-teal-400 mb-4"><i class="fa-solid fa-shield-halved ml-1"></i> لوحة الإدارة والتحكم الأمنية المتقدمة لـ أيمن جران</h3>
-            
+    <div id="adminModal"
+        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div
+            class="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleAdminModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white"><i
+                    class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold text-teal-400 mb-4"><i class="fa-solid fa-shield-halved ml-1"></i> لوحة
+                الإدارة والتحكم الأمنية المتقدمة لـ أيمن جران</h3>
+
             <div class="space-y-6 text-xs md:text-sm">
                 <!-- جرد وإزالة المتواجدين بالنظام -->
                 <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
-                    <h4 class="font-bold text-white mb-2"><i class="fa-solid fa-users-gear text-indigo-400 ml-1"></i> إدارة وإزالة المتواجدين والمسجلين بالنظام</h4>
+                    <h4 class="font-bold text-white mb-2"><i class="fa-solid fa-users-gear text-indigo-400 ml-1"></i>
+                        إدارة وإزالة المتواجدين والمسجلين بالنظام</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs">
                             <thead>
@@ -108,16 +281,50 @@
                 <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
                     <label class="block font-bold text-slate-300 mb-1.5">إضافة تعميم وعاجل جديد وشريط الإشعارات</label>
                     <div class="flex gap-2">
-                        <input id="annInput" type="text" placeholder="اكتب نص الإعلان هنا..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                        <button onclick="submitAnnouncement()" class="bg-indigo-600 hover:bg-indigo-700 px-4 rounded-lg text-white font-bold text-xs">نشر وتنبيه</button>
+                        <input id="annInput" type="text" placeholder="اكتب نص الإعلان هنا..."
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <button onclick="submitAnnouncement()"
+                            class="bg-indigo-600 hover:bg-indigo-700 px-4 rounded-lg text-white font-bold text-xs">نشر
+                            وتنبيه</button>
                     </div>
                 </div>
+
+                <!-- ========================================== -->
+                <!-- قسم تحديث الأجندة والاختبارات (للمندوب فقط) -->
+                <!-- ========================================== -->
+
+                <div class="admin-panel-section">
+                     <h2><i class="fa-solid fa-calendar-day"></i> تحديث أجندة الغد</h2>
+                    <div class="input-group">
+                        <input type="text" id="agenda-lec1" placeholder="المحاضرة الأولى (مثال: OOP)">
+                        <input type="text" id="agenda-time1" placeholder="وقت المحاضرة الأولى (مثال: 10:00 ص)">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="agenda-lec2" placeholder="المحاضرة الثانية (مثال: Web)">
+                        <input type="text" id="agenda-time2" placeholder="وقت المحاضرة الثانية (مثال: 12:00 م)">
+                </div>
+                        <input type="text" id="agenda-status" placeholder="حالة اليوم (مثال: لا توجد اختبارات أو تسليمات)">
+                    <button onclick="submitAgenda()" class="admin-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الأجندة</button>
+                </div>
+
+                <div class="admin-panel-section exam-section" style="margin-top: 30px;">
+                <h2><i class="fa-solid fa-stopwatch"></i> تحديث الاختبار القادم</h2>
+                    <input type="text" id="exam-course" placeholder="اسم مادة الاختبار (مثال: قواعد البيانات)">
+                    <input type="text" id="exam-date" placeholder="تاريخ الاختبار نصياً (مثال: الخميس, 30 يوليو 2026)">
+                    <input type="text" id="exam-time" placeholder="وقت الاختبار (مثال: 09:00 صباحاً)">
+    
+                    <label for="exam-timestamp" style="color:#94a3b8; display:block; margin-top:10px;">وقت المؤقت التنازلي (لعمل الإنذار الأحمر):</label>
+                    <input type="datetime-local" id="exam-timestamp">
+    
+                    <button onclick="submitExam()" class="admin-btn alert-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الاختبار</button>
+                </div>           
 
                 <!-- رفع ملف وتكليف ومواد -->
                 <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
                     <label class="block font-bold text-slate-300 mb-1.5">رفع وتعميم كتل المحاضرات والنماذج</label>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <select id="fileCourse" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <select id="fileCourse"
+                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
                             <option value="قواعد البيانات">قواعد البيانات</option>
                             <option value="مبدأ تراسل بيانات وشبكات">مبدأ تراسل بيانات وشبكات</option>
                             <option value="الصراع العربي الاسرائلي">الصراع العربي الاسرائلي</option>
@@ -127,32 +334,39 @@
                             <option value="هندسة برمجيات">هندسة برمجيات</option>
                             <option value="تطوير تطبيقات الويب">تطوير تطبيقات الويب</option>
                         </select>
-                        <select id="fileSection" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <select id="fileSection"
+                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
                             <option value="نظري">قسم النظري</option>
                             <option value="عملي">قسم العملي</option>
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <select id="fileCategory" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <select id="fileCategory"
+                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
                             <option value="محاضرات">محاضرات</option>
                             <option value="ملخصات">ملخصات</option>
                             <option value="نماذج">نماذج سابقة</option>
                         </select>
-                        <input id="fileTitle" type="text" placeholder="العنوان (مثال: نموذج اختبار نصف الترم)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <input id="fileTitle" type="text" placeholder="العنوان (مثال: نموذج اختبار نصف الترم)"
+                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
                     </div>
-                    <input id="fileUrl" type="text" placeholder="رابط التحميل المباشر من جوجل درايف" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs mb-2">
-                    <button onclick="submitFile()" class="w-full bg-teal-500 text-slate-950 font-bold py-2 rounded-lg text-xs hover:bg-teal-400 transition">رفع وتعميم فوري</button>
+                    <input id="fileUrl" type="text" placeholder="رابط التحميل المباشر من جوجل درايف"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs mb-2">
+                    <button onclick="submitFile()"
+                        class="w-full bg-teal-500 text-slate-950 font-bold py-2 rounded-lg text-xs hover:bg-teal-400 transition">رفع
+                        وتعميم فوري</button>
                 </div>
             </div>
         </div>
     </div>
 
     <footer class="max-w-7xl mx-auto px-4 py-8 mt-12 border-t border-slate-800 text-center text-xs text-slate-500">
-        <p>جميع الحقوق محفوظة © 2026 | تطوير وبرمجة وتأمين المندوب: <span class="text-teal-400 font-bold">أيمن جران</span></p>
+        <p>جميع الحقوق محفوظة © 2026 | تطوير وبرمجة وتأمين المندوب: <span class="text-teal-400 font-bold">أيمن
+                جران</span></p>
     </footer>
 
     <script>
-        const API_URL = "https://ad35323349af4ab2-176-123-29-175.serveousercontent.com";
+        const API_URL = "https://eduhub-backend-je8q.onrender.com";
         let adminToken = ""; // يتم تخزين رمز الحماية هنا بعد التحقق بنجاح
 
         const coursesList = [
@@ -202,7 +416,7 @@
                                 <span class="font-bold text-indigo-400 block mb-2 border-b border-slate-800 pb-1"><i class="fa-solid fa-book ml-1"></i> القسم النظري</span>
                                 <div class="space-y-1.5 text-xxs text-slate-400" id="files-${courseId}-theory">لا توجد أوراق مرفوعة.</div>
                             </div>`;
-                if(course.hasPractical) {
+                if (course.hasPractical) {
                     html += `
                             <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800/80">
                                 <span class="font-bold text-teal-400 block mb-2 border-b border-slate-800 pb-1"><i class="fa-solid fa-flask ml-1"></i> القسم العملي</span>
@@ -218,8 +432,8 @@
                 let sectionType = file.type_section === "نظري" ? "theory" : "practical";
                 let targetId = `files-${courseId}-${sectionType}`;
                 let element = document.getElementById(targetId);
-                if(element) {
-                    if(element.innerText.includes("لا توجد")) element.innerHTML = "";
+                if (element) {
+                    if (element.innerText.includes("لا توجد")) element.innerHTML = "";
                     element.innerHTML += `
                         <a href="${file.file_url}" target="_blank" class="flex items-center justify-between p-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-lg text-slate-300 mb-1">
                             <span><i class="fa-solid fa-file-pdf text-rose-500 ml-1"></i> [${file.file_category}] ${file.title}</span>
@@ -232,7 +446,7 @@
             const res = await fetch(`${API_URL}/announcements`);
             const data = await res.json();
             const container = document.getElementById("announcementsContainer");
-            if(data.length > 0) {
+            if (data.length > 0) {
                 container.innerHTML = "";
                 document.getElementById("notificationBar").innerText = `آخر إعلان وعاجل: ${data[0].content}`;
                 data.forEach(ann => {
@@ -245,7 +459,7 @@
             const res = await fetch(`${API_URL}/grades`);
             const data = await res.json();
             const tbody = document.getElementById("gradesTableBody");
-            if(data.length > 0) {
+            if (data.length > 0) {
                 tbody.innerHTML = "";
                 data.forEach(g => {
                     tbody.innerHTML += `
@@ -258,6 +472,62 @@
                 });
             } else {
                 tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-600 italic">لا توجد درجات مرصودة حالياً.</td></tr>`;
+            }
+        }
+
+
+        // دوال الأجندة والاختبارات
+        async function submitAgenda() {
+         // جلب رمز الأمان من نفس الحقل المستخدم في الإعلانات (تأكدي من أن الـ id صحيح)
+            const adminToken = document.getElementById("adminToken").value; 
+    
+            const agendaData = {
+            lecture_1: document.getElementById("agenda-lec1").value,
+            time_1: document.getElementById("agenda-time1").value,
+            lecture_2: document.getElementById("agenda-lec2").value,
+            time_2: document.getElementById("agenda-time2").value,
+            status_msg: document.getElementById("agenda-status").value
+            };
+
+            const response = await fetch(`${BASE_URL}/agenda/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${adminToken}`
+                },
+                body: JSON.stringify(agendaData)
+            });
+
+            if(response.ok) {
+                alert("تم رفع أجندة الغد إلى السحابة بنجاح!");
+            } else {
+                alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
+            }
+        }
+
+        async function submitExam() {
+            const adminToken = document.getElementById("adminToken").value;
+            
+            const examData = {
+                course_name: document.getElementById("exam-course").value,
+                exam_date_text: document.getElementById("exam-date").value,
+                exam_time: document.getElementById("exam-time").value,
+                timestamp: document.getElementById("exam-timestamp").value
+            };
+
+            const response = await fetch(`${BASE_URL}/exam/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${adminToken}`
+                },
+                body: JSON.stringify(examData)
+            });
+
+            if(response.ok) {
+                alert("تم رفع بيانات الاختبار القادم إلى السحابة بنجاح!");
+            } else {
+                alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
             }
         }
 
@@ -301,7 +571,7 @@
             const data = await res.json();
             renderCourses(data);
             const latestContainer = document.getElementById("latestFilesContainer");
-            if(data.length > 0) {
+            if (data.length > 0) {
                 latestContainer.innerHTML = "";
                 data.slice(0, 5).forEach(f => {
                     latestContainer.innerHTML += `
@@ -315,7 +585,7 @@
 
         async function submitAnnouncement() {
             const text = document.getElementById("annInput").value;
-            if(!text) return;
+            if (!text) return;
             await fetch(`${API_URL}/announcements?content=${encodeURIComponent(text)}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -331,8 +601,8 @@
             const cat = document.getElementById("fileCategory").value;
             const title = document.getElementById("fileTitle").value;
             const url = document.getElementById("fileUrl").value;
-            if(!title || !url) { alert("أكمل البيانات أولاً"); return; }
-            
+            if (!title || !url) { alert("أكمل البيانات أولاً"); return; }
+
             await fetch(`${API_URL}/files?course_name=${encodeURIComponent(course)}&type_section=${encodeURIComponent(sec)}&file_category=${encodeURIComponent(cat)}&title=${encodeURIComponent(title)}&file_url=${encodeURIComponent(url)}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -349,4 +619,5 @@
         });
     </script>
 </body>
+
 </html>
