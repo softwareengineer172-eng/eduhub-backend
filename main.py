@@ -5,6 +5,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import create_engine, Column, Integer, String, Float, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
+from fastapi import Request # تأكدي من إضافة Request هنا إذا لم تكن موجودة
+from datetime import datetime
 
 # 1. إعداد قاعدة البيانات وتوليد الملف تلقائياً
 SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:npg_EDprP1fHxR5n@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
@@ -161,3 +163,38 @@ def create_exam(exam: ExamCreate, db: Session = Depends(get_db), token: str = De
     db.commit()
     db.refresh(new_exam)
     return new_exam
+
+# قاموس سري في الذاكرة المؤقتة لتخزين الأجهزة المتصلة
+online_users = {}
+
+# 1. مسار مخفي لاستقبال نبضات الطلاب بصمت
+@app.get("/ping")
+async def silent_ping(request: Request, device: str = "جهاز غير معروف"):
+    # سحب رقم الـ IP بطريقة آمنة جداً لا تزعج Pylance
+    client_host = request.client.host if request.client else "unknown_ip"
+    client_ip = request.headers.get("x-forwarded-for", client_host).split(",")[0]
+    
+    # تسجيل الجهاز ووقت تواجده الآن
+    online_users[client_ip] = {
+        "device": device,
+        "last_active": datetime.now()
+    }
+    return {"status": "ok"}
+
+# 2. مسار للمندوب لمعرفة العدد الحي
+@app.get("/admin/online_count")
+async def get_online_stats():
+    now = datetime.now()
+    # تنظيف النظام: أي طالب يغلق الموقع ولن يرسل نبضة لمدة دقيقتين سيتم حذفه
+    active_users = {ip: data for ip, data in online_users.items() if (now - data["last_active"]).total_seconds() < 120}
+    
+    # تحديث القائمة
+    online_users.clear()
+    online_users.update(active_users)
+    
+    # حصر أنواع الأجهزة
+    devices = [data["device"] for data in active_users.values()]
+    return {
+        "count": len(active_users),
+        "details": devices
+    }

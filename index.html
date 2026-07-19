@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduHub v2.0 - بوابة هندسة البرمجيات المؤمنة</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- رابط مكتبة FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
 
@@ -193,6 +194,7 @@
         <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">البوابة الأكاديمية الشاملة لدفعة هندسة البرمجيات</h1>
         <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">تطوير وتنسيق وتأمين المندوب المطور: <span
                 class="text-teal-400 font-bold">أيمن جران</span></p>
+        <!-- شريط المهام السريع - محدث -->
     </header>
 
     <!-- المحتوى الرئيسي للموقع -->
@@ -206,6 +208,33 @@
                     <p class="text-slate-500 italic">لا توجد إعلانات معروضة حالياً.</p>
                 </div>
             </section>
+
+            <!-- === قسم الأجندة والاختبارات (Tailwind CSS) === -->
+        <div class="flex flex-col md:flex-row gap-6 mb-8 w-full max-w-4xl mx-auto px-4">
+            
+            <!-- بطاقة الأجندة -->
+            <div class="flex-1 bg-slate-900/80 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                <h3 class="text-blue-400 font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day"></i> أجندة الغد
+                </h3>
+                <ul id="agenda-container" class="space-y-3 text-slate-300 text-sm">
+                    <li><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الأجندة...</li>
+                </ul>
+            </div>
+
+            <!-- بطاقة الاختبار -->
+            <div id="exam-card" class="flex-1 bg-slate-900/80 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500"></div>
+                <h3 class="text-red-400 font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-stopwatch"></i> الاختبار القادم
+                </h3>
+                <div id="exam-container" class="space-y-2 text-slate-300 text-sm">
+                    <p><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل بيانات الاختبار...</p>
+                </div>
+            </div>
+
+        </div>
             <section class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl">
                 <h3 class="text-teal-400 font-bold text-sm mb-3 flex items-center gap-2"><i
                         class="fa-solid fa-folder-open"></i> أحدث الملفات المرفوعة</h3>
@@ -293,8 +322,9 @@
                 <!-- قسم تحديث الأجندة والاختبارات (للمندوب فقط) -->
                 <!-- ========================================== -->
 
+                <!-- === قسم الأجندة === -->
                 <div class="admin-panel-section">
-                     <h2><i class="fa-solid fa-calendar-day"></i> تحديث أجندة الغد</h2>
+                    <h2><i class="fa-solid fa-calendar-day"></i> تحديث أجندة الغد</h2>
                     <div class="input-group">
                         <input type="text" id="agenda-lec1" placeholder="المحاضرة الأولى (مثال: OOP)">
                         <input type="text" id="agenda-time1" placeholder="وقت المحاضرة الأولى (مثال: 10:00 ص)">
@@ -302,20 +332,28 @@
                     <div class="input-group">
                         <input type="text" id="agenda-lec2" placeholder="المحاضرة الثانية (مثال: Web)">
                         <input type="text" id="agenda-time2" placeholder="وقت المحاضرة الثانية (مثال: 12:00 م)">
-                </div>
-                        <input type="text" id="agenda-status" placeholder="حالة اليوم (مثال: لا توجد اختبارات أو تسليمات)">
+                    </div>
+                    <input type="text" id="agenda-status" placeholder="حالة اليوم (مثال: لا توجد اختبارات أو تسليمات)">
+                    
+                    <!-- حقل الرمز السري للأجندة (لاحظي الـ id الجديد) -->
+                    <input type="password" id="publishTokenAgenda" placeholder="🔑 أدخلي الرمز السري للتأكيد" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #475569;">
+                    
                     <button onclick="submitAgenda()" class="admin-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الأجندة</button>
                 </div>
 
+                <!-- === قسم الاختبارات === -->
                 <div class="admin-panel-section exam-section" style="margin-top: 30px;">
-                <h2><i class="fa-solid fa-stopwatch"></i> تحديث الاختبار القادم</h2>
+                    <h2><i class="fa-solid fa-stopwatch"></i> تحديث الاختبار القادم</h2>
                     <input type="text" id="exam-course" placeholder="اسم مادة الاختبار (مثال: قواعد البيانات)">
                     <input type="text" id="exam-date" placeholder="تاريخ الاختبار نصياً (مثال: الخميس, 30 يوليو 2026)">
                     <input type="text" id="exam-time" placeholder="وقت الاختبار (مثال: 09:00 صباحاً)">
-    
+                    
                     <label for="exam-timestamp" style="color:#94a3b8; display:block; margin-top:10px;">وقت المؤقت التنازلي (لعمل الإنذار الأحمر):</label>
                     <input type="datetime-local" id="exam-timestamp">
-    
+                    
+                    <!-- حقل الرمز السري للاختبار (لاحظي الـ id الجديد) -->
+                    <input type="password" id="publishTokenExam" placeholder="🔑 أدخلي الرمز السري للتأكيد" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #475569;">
+                    
                     <button onclick="submitExam()" class="admin-btn alert-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الاختبار</button>
                 </div>           
 
@@ -360,10 +398,67 @@
         </div>
     </div>
 
-    <footer class="max-w-7xl mx-auto px-4 py-8 mt-12 border-t border-slate-800 text-center text-xs text-slate-500">
-        <p>جميع الحقوق محفوظة © 2026 | تطوير وبرمجة وتأمين المندوب: <span class="text-teal-400 font-bold">أيمن
-                جران</span></p>
-    </footer>
+        <!-- ================= الفوتر الاحترافي ================= -->
+        <footer class="mt-16 border-t border-slate-800 bg-slate-900/40 backdrop-blur-lg">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    
+                    <!-- معلومات التطوير والحقوق -->
+                    <div class="text-center md:text-right">
+                        <p class="text-slate-400 text-sm">
+                            &copy; 2026 جميع الحقوق محفوظة لمنصة <span class="text-teal-400 font-bold">EduHub</span>
+                        </p>
+                        <p class="text-slate-500 text-xs mt-1">
+                            تطوير وبرمجة وتأمين المندوب: <span class="text-emerald-400 font-medium">أيمن جران</span>
+                        </p>
+                    </div>
+
+                    <!-- زر التواصل التفاعلي -->
+                    <div>
+                        <button onclick="toggleContactModal()" class="flex items-center gap-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-teal-600 hover:to-emerald-600 text-slate-300 hover:text-white border border-slate-700 hover:border-teal-500 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(20,184,166,0.4)] transform hover:-translate-y-1">
+                            <i class="fa-solid fa-headset"></i> تواصل مع المندوب
+                        </button>
+                    </div>
+                    
+                </div>
+            </div>
+        </footer>
+
+        <!-- ================= نافذة الدعم والتواصل (مخفية افتراضياً) ================= -->
+        <div id="contactModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300 opacity-0">
+            <!-- صندوق النافذة -->
+            <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-700 shadow-2xl relative transform scale-95 transition-transform duration-300" id="contactModalContent">
+                
+                <!-- رأس النافذة -->
+                <div class="border-b border-slate-800 p-5 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-envelope-open-text text-teal-400"></i> مركز المساعدة
+                    </h3>
+                    <button onclick="toggleContactModal()" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- محتوى النافذة (أزرار التواصل) -->
+                <div class="p-6 space-y-4">
+                    <p class="text-slate-300 text-sm leading-relaxed text-center mb-6">
+                        هل تواجه مشكلة تقنية في المنصة أو تحتاج لمساعدة في الملفات الأكاديمية؟ لا تتردد في التواصل.
+                    </p>
+                    
+                    <!-- زر واتساب -->
+                    <a href="https://wa.me/+967776609586" target="_blank" class="flex items-center justify-center gap-3 w-full bg-slate-800 hover:bg-[#25D366]/10 border border-slate-700 hover:border-[#25D366] text-slate-200 hover:text-[#25D366] p-3 rounded-xl transition-all group">
+                        <i class="fa-brands fa-whatsapp text-xl group-hover:scale-110 transition-transform"></i>
+                        <span class="font-medium">رسالة عبر واتساب</span>
+                    </a>
+
+                    <!-- زر تيليجرام -->
+                    <a href="https://t.me/Aiman_eng" target="_blank" class="flex items-center justify-center gap-3 w-full bg-slate-800 hover:bg-[#229ED9]/10 border border-slate-700 hover:border-[#229ED9] text-slate-200 hover:text-[#229ED9] p-3 rounded-xl transition-all group">
+                        <i class="fa-brands fa-telegram text-xl group-hover:scale-110 transition-transform"></i>
+                        <span class="font-medium">رسالة عبر تيليجرام</span>
+                    </a>
+                </div>
+            </div>
+        </div>
 
     <script>
         const API_URL = "https://eduhub-backend-je8q.onrender.com";
@@ -475,97 +570,119 @@
             }
         }
 
-
-        // دوال الأجندة والاختبارات
-        async function submitAgenda() {
-         // جلب رمز الأمان من نفس الحقل المستخدم في الإعلانات (تأكدي من أن الـ id صحيح)
-            const adminToken = document.getElementById("adminToken").value; 
+async function submitAgenda() {
+    // السطر الجديد الذي يحل المشكلة: تعريف رابط السيرفر
+    const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
     
-            const agendaData = {
-            lecture_1: document.getElementById("agenda-lec1").value,
-            time_1: document.getElementById("agenda-time1").value,
-            lecture_2: document.getElementById("agenda-lec2").value,
-            time_2: document.getElementById("agenda-time2").value,
-            status_msg: document.getElementById("agenda-status").value
-            };
+    const adminToken = document.getElementById("publishTokenAgenda").value;
+    
+    const agendaData = {
+        lecture_1: document.getElementById("agenda-lec1").value,
+        time_1: document.getElementById("agenda-time1").value,
+        lecture_2: document.getElementById("agenda-lec2").value,
+        time_2: document.getElementById("agenda-time2").value,
+        status_msg: document.getElementById("agenda-status").value
+    };
 
-            const response = await fetch(`${BASE_URL}/agenda/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${adminToken}`
-                },
-                body: JSON.stringify(agendaData)
-            });
+    const response = await fetch(`${BASE_URL}/agenda/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(agendaData)
+    });
 
-            if(response.ok) {
-                alert("تم رفع أجندة الغد إلى السحابة بنجاح!");
-            } else {
-                alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
+    if (response.ok) {
+        alert("تم رفع أجندة الغد إلى السحابة بنجاح!");
+    } else {
+        alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
+    }
+}
+
+async function submitExam() {
+    // السطر الجديد الذي يحل المشكلة: تعريف رابط السيرفر
+    const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
+    
+    const adminToken = document.getElementById("publishTokenExam").value;
+    
+    const examData = {
+        course_name: document.getElementById("exam-course").value,
+        exam_date_text: document.getElementById("exam-date").value,
+        exam_time: document.getElementById("exam-time").value,
+        timestamp: document.getElementById("exam-timestamp").value
+    };
+
+    const response = await fetch(`${BASE_URL}/exam/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(examData)
+    });
+
+    if (response.ok) {
+        alert("تم رفع بيانات الاختبار القادم إلى السحابة بنجاح!");
+    } else {
+        alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
+    }
+    }
+
+    // دالة الرادار: جرد وسحب قائمة المتصلين حالياً وعرضها في الجدول المخصص
+    async function loadAdminStudents() {
+        const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
+        
+        try {
+            const res = await fetch(`${BASE_URL}/admin/online_count`);
+            if(res.ok) {
+                const data = await res.json();
+                const listContainer = document.getElementById("adminStudentsList");
+                
+                if(listContainer) {
+                    listContainer.innerHTML = "";
+                    
+                    // التأكد من وجود متصلين حالياً
+                    if (data.count > 0 && data.details) {
+                        data.details.forEach((device, index) => {
+                            listContainer.innerHTML += `
+                                <tr class="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors">
+                                    <!-- العمود الأول: اسم الزائر ونوع الجهاز -->
+                                    <td class="py-3 px-2 text-white font-medium">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-user-secret text-indigo-400"></i>
+                                            <div>
+                                                <span class="block">زائر متخفي #${index + 1}</span>
+                                                <span class="text-xs text-slate-400 font-normal"><i class="fa-solid fa-mobile-screen text-slate-500 ml-1"></i> ${device}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- العمود الثاني: حالة الاتصال بدلاً من زر الحذف -->
+                                    <td class="py-3 px-2 text-center">
+                                        <span class="inline-flex items-center justify-center bg-emerald-950 border border-emerald-800 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                            <i class="fa-solid fa-circle-dot animate-pulse ml-1"></i> متصل الآن
+                                        </span>
+                                    </td>
+                                </tr>`;
+                        });
+                    } else {
+                        // إذا كان الموقع فارغاً
+                        listContainer.innerHTML = `
+                            <tr>
+                                <td colspan="2" class="py-6 text-center text-slate-500 italic">
+                                    <i class="fa-solid fa-radar fa-spin text-2xl block mb-2 opacity-50"></i>
+                                    الرادار هادئ.. لا يوجد طلاب متصلين بالنظام حالياً.
+                                </td>
+                            </tr>`;
+                    }
+                }
             }
+        } catch (e) {
+            console.log("حدث خطأ في تشغيل الرادار:", e);
         }
-
-        async function submitExam() {
-            const adminToken = document.getElementById("adminToken").value;
-            
-            const examData = {
-                course_name: document.getElementById("exam-course").value,
-                exam_date_text: document.getElementById("exam-date").value,
-                exam_time: document.getElementById("exam-time").value,
-                timestamp: document.getElementById("exam-timestamp").value
-            };
-
-            const response = await fetch(`${BASE_URL}/exam/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${adminToken}`
-                },
-                body: JSON.stringify(examData)
-            });
-
-            if(response.ok) {
-                alert("تم رفع بيانات الاختبار القادم إلى السحابة بنجاح!");
-            } else {
-                alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
-            }
-        }
-
-        // جرد وسحب قائمة الطلاب المتواجدين وعرضها للمندوب مع زر الإزالة والتحكم
-        async function loadAdminStudents() {
-            const res = await fetch(`${API_URL}/grades`);
-            const data = await res.json();
-            const listContainer = document.getElementById("adminStudentsList");
-            listContainer.innerHTML = "";
-            if (data.length > 0) {
-                data.forEach(student => {
-                    listContainer.innerHTML += `
-                        <tr class="border-b border-slate-800/40">
-                            <td class="py-2 text-white font-medium">${student.student_name}</td>
-                            <td class="py-2 text-center">
-                                <button onclick="deleteStudent(${student.id})" class="bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-400 px-3 py-1 rounded-lg text-xxs font-bold transition">
-                                    <i class="fa-solid fa-user-xmark ml-1"></i> إزالة وطرد الطالب
-                                </button>
-                            </td>
-                        </tr>`;
-                });
-            } else {
-                listContainer.innerHTML = `<tr><td colspan="2" class="py-4 text-center text-slate-600 italic">لا يوجد طلاب متواجدين حالياً بالنظام لجلبهم.</td></tr>`;
-            }
-        }
-
-        // إزالة وطرد شخص فورياً من قاعدة البيانات والمنظومة
-        async function deleteStudent(studentId) {
-            if (!confirm("هل أنت متأكد تماماً من قرار طرد وإزالة هذا الشخص وحذف درجاته نهائياً من السيستم؟")) return;
-            await fetch(`${API_URL}/admin/students/${studentId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${adminToken}` }
-            });
-            alert("تم إزالة الشخص بنجاح وتطهير كشوفات النظام فوراً!");
-            loadAdminStudents();
-            loadGrades();
-        }
-
+    }
+ // .....
         async function loadAllFiles() {
             const res = await fetch(`${API_URL}/files`);
             const data = await res.json();
@@ -617,6 +734,120 @@
             loadAllFiles();
             loadGrades();
         });
+        
+ 
+        document.addEventListener("DOMContentLoaded", async function() {
+            const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
+
+            // 1. جلب بيانات الأجندة
+            try {
+                const res = await fetch(`${BASE_URL}/agenda/`);
+                if(res.ok) {
+                    const agenda = await res.json();
+                    const container = document.getElementById('agenda-container');
+                    if(agenda && container) {
+                        let htmlContent = '';
+                        
+                        if (agenda.lecture_1) {
+                            htmlContent += `<li class="flex justify-between border-b border-slate-800 pb-2"><span class="text-white"><i class="fa-solid fa-laptop-code text-blue-400"></i> ${agenda.lecture_1}</span> <span class="text-slate-400">${agenda.time_1}</span></li>`;
+                        }
+                        if (agenda.lecture_2) {
+                            htmlContent += `<li class="flex justify-between border-b border-slate-800 pb-2"><span class="text-white"><i class="fa-solid fa-globe text-blue-400"></i> ${agenda.lecture_2}</span> <span class="text-slate-400">${agenda.time_2}</span></li>`;
+                        }
+                        if (agenda.status_msg) {
+                            htmlContent += `<li class="text-slate-500 italic mt-2"><i class="fa-solid fa-circle-info"></i> ${agenda.status_msg}</li>`;
+                        }
+                        
+                        // إذا لم يتم كتابة أي شيء في الأجندة
+                        if(htmlContent === '') {
+                            htmlContent = `<li class="text-slate-500 italic"><i class="fa-solid fa-circle-info"></i> لا توجد بيانات مسجلة لجدول الغد.</li>`;
+                        }
+                        
+                        container.innerHTML = htmlContent;
+                    }
+                }
+            } catch(e) { console.log("خطأ في جلب الأجندة:", e); }
+
+            // 2. جلب بيانات الاختبار مع المؤقت التنازلي
+            try {
+                const res = await fetch(`${BASE_URL}/exam/`);
+                if(res.ok) {
+                    const exam = await res.json();
+                    const container = document.getElementById('exam-container');
+                    if(exam && container) {
+                        container.innerHTML = `
+                            <h4 class="text-emerald-400 font-bold mb-2">${exam.course_name}</h4>
+                            <p class="flex gap-2 items-center"><i class="fa-regular fa-calendar text-slate-400"></i> ${exam.exam_date_text}</p>
+                            <p class="flex gap-2 items-center"><i class="fa-regular fa-clock text-slate-400"></i> ${exam.exam_time}</p>
+                            <p id="time-left-msg" class="text-orange-400 text-xs mt-3 font-bold"></p>
+                        `;
+
+                        // تشغيل المؤقت التنازلي
+                        if(exam.timestamp) {
+                            const examDate = new Date(exam.timestamp).getTime();
+                            const timerInterval = setInterval(() => {
+                                const now = new Date().getTime();
+                                const distance = examDate - now;
+                                const msgElement = document.getElementById("time-left-msg");
+
+                                if(msgElement) {
+                                    if (distance < 0) {
+                                        clearInterval(timerInterval);
+                                        msgElement.innerText = "انتهى وقت الاختبار، بالتوفيق للجميع!";
+                                        msgElement.className = "text-slate-500 text-xs mt-3 font-bold";
+                                    } else {
+                                        const daysLeft = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                        const hoursLeft = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                        
+                                        if (daysLeft === 0) {
+                                            msgElement.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> تنبيه: متبقي أقل من 24 ساعة!`;
+                                            msgElement.className = "text-red-500 text-xs mt-3 font-bold animate-pulse";
+                                        } else {
+                                            msgElement.innerText = `متبقي: ${daysLeft} أيام و ${hoursLeft} ساعات`;
+                                        }
+                                    }
+                                }
+                            }, 1000);
+                        }
+                    }
+                }
+            } catch(e) { console.log("خطأ في جلب الاختبار:", e); }
+        });
+
+        // دالة التحكم في نافذة التواصل
+        function toggleContactModal() {
+            const modal = document.getElementById('contactModal');
+            const content = document.getElementById('contactModalContent');
+            
+            if (modal.classList.contains('hidden')) {
+                // أوامر فتح النافذة
+                modal.classList.remove('hidden');
+                modal.classList.add('flex'); // لضمان التوسيط
+                
+                // تأخير زمني بسيط جداً لتفعيل تأثير الدخول (Animation)
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }, 10);
+            } else {
+                // أوامر إغلاق النافذة بتأثير الخروج
+                modal.classList.add('opacity-0');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                
+                // إخفاء العنصر تماماً بعد انتهاء تأثير الخروج
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            }
+        }
+</script>
+</body>
+</html>
+</script>
+        
     </script>
 </body>
 
