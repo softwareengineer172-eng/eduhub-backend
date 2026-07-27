@@ -9,17 +9,60 @@ from fastapi import Request # تأكدي من إضافة Request هنا إذا �
 from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from datetime import datetime, timedelta
+from typing import Dict
 
 app = FastAPI()
 
-# السماح لجميع النطاقات بالتواصل مع السيرفر (حل مشكلة CORS)
+# 1. إعدادات CORS الشاملة (لحل مشاكل الحظر من المتصفح)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 2. قاموس (ذاكرة مؤقتة) لتخزين بيانات المتصلين
+active_sessions: Dict[str, datetime] = {}
+
+# 3. نموذج البيانات القادمة من جهاز الطالب
+class PresenceData(BaseModel):
+    student_id: str
+    status: str
+    timestamp: str
+
+# 4. المسار النهائي لتسجيل الحضور (هذا سيخفي خطأ 404 الأحمر)
+@app.post("/presence")
+async def update_presence(data: PresenceData):
+    # تسجيل وقت آخر نبضة وصلت من هذا الجهاز
+    active_sessions[data.student_id] = datetime.now()
+    return {"message": "تم تسجيل التواجد بنجاح", "status": "success"}
+
+# 5. المسار النهائي للوحة الإدارة (الذي سيغير العدد من 0 إلى العدد الحقيقي)
+@app.get("/admin/online_count")
+async def get_online_count():
+    now = datetime.now()
+    # تحديد المهلة الزمنية: نعتبر الطالب غير متصل إذا لم يرسل نبضة لمدة دقيقتين
+    timeout = timedelta(minutes=2)
+    
+    active_users_list = []
+    
+    # فلترة المتصلين وحذف من أغلق الموقع
+    for student_id, last_seen in list(active_sessions.items()):
+        if now - last_seen < timeout:
+            active_users_list.append({"id": student_id, "last_seen": last_seen.isoformat()})
+        else:
+            # إذا مرت دقيقتان ولم يُرسل نبضة، نحذفه من الرادار
+            del active_sessions[student_id]
+            
+    return {
+        "count": len(active_users_list),
+        "details": active_users_list
+    }
+
+# (هنا يمكنك إبقاء بقية مساراتك الخاصة بـ /grades و /announcements كما هي)
 
 # 1. إعداد قاعدة البيانات وتوليد الملف تلقائياً
 SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:npg_EDprP1fHxR5n@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
