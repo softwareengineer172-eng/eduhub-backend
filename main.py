@@ -7,6 +7,19 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi import Request # تأكدي من إضافة Request هنا إذا لم تكن موجودة
 from datetime import datetime
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# السماح لجميع النطاقات بالتواصل مع السيرفر (حل مشكلة CORS)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 1. إعداد قاعدة البيانات وتوليد الملف تلقائياً
 SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://neondb_owner:npg_EDprP1fHxR5n@ep-hidden-thunder-ahprk4ag-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
