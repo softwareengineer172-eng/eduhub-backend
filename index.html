@@ -843,6 +843,35 @@ async function submitExam() {
                 }, 300);
             }
         }
+
+    
+        // دالة صامتة تعمل في الخلفية لتسجيل تواجد الطالب كل 30 ثانية
+        function reportPresence() {
+            fetch('https://eduhub-backend-je8q.onrender.com/presence', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                student_id: navigator.userAgent, // استخدام بصمة الجهاز كمعرف مؤقت أو معرف الطالب إذا كان تسجيل الدخول مفعلاً
+                status: 'active',
+                timestamp: new Date().toISOString()
+            })
+            })
+            .then(response => {
+            // لا نقوم بإظهار أي تنبيه للمستخدم، العملية تتم بصمت تام
+            })
+            .catch(error => {
+            // تجاهل الأخطاء بصمت لكي لا تتأثر تجربة المستخدم
+            });
+        }
+
+        // إرسال أول إشارة فور فتح الصفحة
+        window.addEventListener('load', () => {
+            reportPresence();
+            // تحديث الإشارة كل 30 ثانية ليظل الرادار يعلم أنه ما زال متصلاً
+            setInterval(reportPresence, 30000);
+        });
 </script>
 </body>
 </html>
