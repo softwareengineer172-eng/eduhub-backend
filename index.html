@@ -1,883 +1,590 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduHub v2.0 - بوابة هندسة البرمجيات المؤمنة</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- رابط مكتبة FontAwesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-        }
-
-        /* ========================================= */
-        /* تنسيقات لوحة تحكم المندوب (تصميم زجاجي نيون) */
-        /* ========================================= */
-
-        /* الحاوية الرئيسية للبطاقات */
-        .admin-panel-section {
-            background: rgba(30, 41, 59, 0.7); /* لون داكن مع شفافية زجاجية */
-            padding: 25px 30px;
-            border-radius: 16px;
-            border: 1px solid #334155;
-            max-width: 650px;
-            margin: 0 auto 35px auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(12px);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .admin-panel-section:hover {
-            transform: translateY(-3px);
-        }
-
-        /* تأثير الإضاءة العلوية الذكية لإبراز البطاقة */
-        .admin-panel-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #38bdf8, #818cf8); /* تدرج أزرق للأجندة */
-        }
-
-        .admin-panel-section.exam-section::before {
-            background: linear-gradient(90deg, #ef4444, #f97316); /* تدرج أحمر/برتقالي للاختبارات */
-        }
-
-        /* تنسيق العناوين داخل البطاقات */
-        .admin-panel-section h2 {
-            color: #f8fafc;
-            font-size: 1.4em;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-            padding-bottom: 15px;
-        }
-
-        .admin-panel-section h2 i {
-            color: #38bdf8;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-        }
-
-        .admin-panel-section.exam-section h2 i {
-            color: #ef4444;
-            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-        }
-
-        /* ترتيب الحقول المزدوجة (للمحاضرات والأوقات) */
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 5px;
-        }
-
-        /* استجابة الحقول للشاشات الصغيرة (الجوال) */
-        @media (max-width: 600px) {
-            .input-group {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-
-        /* تصميم حقول الإدخال (الأنبوت) */
-        .admin-panel-section input {
-            width: 100%;
-            padding: 14px 18px;
-            margin-bottom: 18px;
-            border-radius: 10px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: #f8fafc;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            outline: none;
-            font-family: inherit;
-        }
-
-        /* تأثير النيون عند الكتابة داخل الحقل */
-        .admin-panel-section input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-            background: #1e293b;
-        }
-
-        .admin-panel-section.exam-section input:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
-        }
-
-        /* تنسيق النصوص التوضيحية (Labels) */
-        .admin-panel-section label {
-            font-size: 0.9em;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            display: inline-block;
-            font-weight: 500;
-        }
-
-        /* الأزرار الاحترافية (Gradient Buttons) */
-        .admin-btn {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: white;
-            padding: 14px 25px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.05em;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
-            margin-top: 10px;
-        }
-
-        .admin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-        }
-
-        /* زر الاختبار (أحمر تنبيهي) */
-        .alert-btn {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
-        }
-
-        .alert-btn:hover {
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-            background: linear-gradient(135deg, #b91c1c, #dc2626);
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="EduHub — بوابة أكاديمية منظمة لمقررات وملفات هندسة البرمجيات.">
+  <meta name="eduhub-api-url" content="https://eduhub-backend-je8q.onrender.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>EduHub | البوابة الأكاديمية</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1220;--panel:#111b2d;--panel2:#0e1727;--line:#25344b;--text:#e7eef8;--muted:#9aabc2;--teal:#43d6c4;--blue:#82a9ff;--danger:#ff8585;--gold:#f6ca78;--radius:18px;--shadow:0 14px 38px #0002}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#14213a 0,#0b1220 48%);color:var(--text);font-family:'Tajawal',system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.7;letter-spacing:0}button,input,select,textarea{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.wrap{width:min(1180px,calc(100% - 28px));margin:auto}.topline{background:#132c3b;border-bottom:1px solid #244a56;color:#c7f8f1;text-align:center;padding:8px 12px;font-size:.86rem}.nav{position:sticky;top:0;z-index:10;background:#0b1220ed;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:1.2rem}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,#155e75,#0f766e);color:#d9fffa;font-size:1.25rem}.brand small{display:block;color:var(--muted);font-weight:500;font-size:.72rem}.btn{border:1px solid var(--line);border-radius:11px;padding:10px 14px;background:#17243a;color:var(--text);font-weight:700}.btn:hover{filter:brightness(1.15)}.btn-primary{background:#0e766e;border-color:#168d82;color:#effffc}.btn-danger{color:#ffc6c6;border-color:#743b4b;background:#351d2b}.hero{padding:34px 0 22px}.eyebrow{color:var(--teal);font-size:.84rem;font-weight:800;letter-spacing:.03em}.hero h1{font-size:clamp(1.6rem,4vw,2.5rem);line-height:1.25;margin:8px 0}.hero p{color:var(--muted);margin:8px 0 0;max-width:720px}.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,1fr);gap:18px;padding-bottom:24px}.stack{display:grid;gap:18px;align-content:start}.panel{background:linear-gradient(150deg,#121d30f2,#0e1727f5);border:1px solid var(--line);border-radius:var(--radius);padding:19px;box-shadow:var(--shadow);min-width:0}.panel h2,.panel h3{margin:0 0 12px;font-size:1.05rem}.panel h2 span,.panel h3 span{color:var(--teal);margin-left:8px}.muted{color:var(--muted)}.small{font-size:.88rem}.list{display:grid;gap:9px}.announcement{padding:11px 12px;background:#0a1322;border:1px solid #1c2a40;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.agenda-item{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #203047}.agenda-item:last-child{border-bottom:0}.exam-title{font-weight:800;color:var(--gold);font-size:1.12rem}.filters{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin:12px 0 18px}.field{display:grid;gap:5px;min-width:0}.field label{font-size:.83rem;color:var(--muted);font-weight:700}.field input,.field select,.field textarea,.admin-form input,.admin-form select{width:100%;min-width:0;background:#091321;border:1px solid #2a3a52;color:var(--text);border-radius:10px;padding:10px 11px;outline:none}.field input:focus,.field select:focus,.field textarea:focus,.admin-form input:focus,.admin-form select:focus{border-color:var(--teal);box-shadow:0 0 0 3px #43d6c41a}.courses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.course{background:#0b1525;border:1px solid #25344b;border-radius:15px;padding:15px;min-width:0}.course h3{font-size:1rem;margin:0 0 3px;overflow-wrap:anywhere}.course-prof{font-size:.82rem;color:var(--muted);margin-bottom:12px}.file-list{display:grid;gap:7px}.file-link{display:flex;align-items:start;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:10px;background:#111f33;border:1px solid #24354c;color:var(--text);overflow-wrap:anywhere}.file-link span{min-width:0}.file-link small{display:block;color:var(--muted);font-size:.78rem}.tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;background:#12333a;color:#8ff1e2;font-size:.74rem;font-weight:800}.empty,.error{border:1px dashed #34445d;color:var(--muted);padding:16px;border-radius:12px;text-align:center}.error{color:#ffc0c0;border-color:#6d3c4a}.grades-private{display:flex;gap:12px;align-items:start;background:#211f1b;border:1px solid #5a4a2a;border-radius:12px;padding:13px;color:#f5dfb2}.footer{border-top:1px solid var(--line);margin-top:24px;padding:23px 0 32px;color:var(--muted);font-size:.86rem}.footer-inner{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.modal{position:fixed;inset:0;z-index:30;background:#030813d9;backdrop-filter:blur(7px);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}.modal.open{display:flex}.modal-box{width:min(900px,100%);background:#0d1727;border:1px solid #2c3c54;border-radius:18px;padding:20px;box-shadow:0 30px 80px #0008}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px}.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.admin-section{border:1px solid var(--line);background:#101b2d;border-radius:14px;padding:15px;min-width:0}.admin-section h3{margin:0 0 12px}.admin-form{display:grid;gap:9px}.admin-form .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-actions{display:flex;gap:7px;flex-wrap:wrap}.admin-items{display:grid;gap:8px;margin-top:12px}.admin-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;background:#091321;border:1px solid #23324a;border-radius:10px}.admin-item-main{min-width:0;overflow-wrap:anywhere}.admin-item-actions{display:flex;gap:6px;flex-shrink:0}.btn-sm{font-size:.78rem;padding:6px 9px;border-radius:8px}.status{margin:10px 0;padding:10px 12px;border-radius:10px;background:#122c2b;color:#b8fff3;display:none}.status.show{display:block}.status.bad{background:#351e29;color:#ffd2d2}.hidden{display:none!important}
+    .panel{padding:clamp(16px,2.2vw,24px);transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}.panel:hover{border-color:#3b526f;box-shadow:0 18px 44px #0003}.panel h2{display:flex;align-items:center;gap:9px;font-size:1.16rem;letter-spacing:-.01em}.panel h2 span{display:inline-grid;place-items:center;width:34px;height:34px;margin:0;border-radius:11px;background:#12313a;color:#72e4d5;font-size:1rem}.hero{padding-block:clamp(28px,5vw,54px) 28px}.hero h1{font-weight:800;letter-spacing:-.035em}.hero p{font-size:1.04rem;line-height:1.9}.course,.admin-section,.announcement,.file-link,.agenda-item{transition:transform .18s ease,border-color .18s ease,background .18s ease}.course:hover,.file-link:hover{border-color:#3e7180;transform:translateY(-2px)}.agenda-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:13px 12px;border:1px solid #23344b;border-radius:13px;background:#0b1728}.agenda-item:hover{border-color:#3e7180}.timeline{display:grid;gap:10px}.timeline-card{position:relative;display:grid;grid-template-columns:76px 1fr;gap:12px;padding:14px;border:1px solid #263950;border-radius:15px;background:linear-gradient(130deg,#13243a,#0d192a);box-shadow:0 7px 20px #0002}.timeline-time{align-self:start;text-align:center;border-radius:11px;padding:8px 5px;background:#12383d;color:#91f1e4;font-weight:800;font-size:.82rem;direction:ltr}.timeline-title{font-weight:800;font-size:1rem;line-height:1.5}.timeline-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:.84rem}.timeline-note{margin-top:12px;padding:11px 13px;border-radius:12px;background:#332c1b;border:1px solid #5b4a2a;color:#f8dfa4;white-space:pre-wrap}.schedule-form{display:grid;gap:10px}.schedule-form .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.schedule-day{font-weight:800;color:var(--teal);margin:14px 0 7px}.admin-section h3{font-size:1.03rem;font-weight:800}.btn,.file-link{transition:filter .18s ease,transform .18s ease,border-color .18s ease}.btn:hover{transform:translateY(-1px)}input,select,textarea{accent-color:#43d6c4}::selection{background:#2a827d;color:white}
+    .weekly-public{display:grid;gap:14px}.weekly-public-day{display:grid;gap:7px}.weekly-public-day .schedule-day{margin:0}.weekly-public-day .timeline{gap:8px}.weekly-public-day .timeline-card{padding:11px}
+    .topline{background:linear-gradient(90deg,#102a3a,#123c43,#102a3a);letter-spacing:.01em;font-weight:700;padding:10px 14px}.hero{position:relative;isolation:isolate;text-align:center;padding-block:clamp(32px,5vw,58px) 34px}.hero:before{content:"";position:absolute;z-index:-1;inset:10px 0 0;border:1px solid #2c5964;border-radius:26px;background:radial-gradient(ellipse at top,#16445280,transparent 65%),linear-gradient(135deg,#111f33e8,#0e1727e8);box-shadow:0 24px 70px #0003}.hero-mark{display:inline-flex;align-items:center;gap:8px;border:1px solid #2a6c70;background:#12353c;color:#9af0e4;border-radius:999px;padding:5px 13px;font-size:.82rem;font-weight:800}.hero h1{max-width:920px;margin:16px auto 10px;font-size:clamp(1.65rem,4.1vw,2.8rem);line-height:1.45;color:#f4f8ff}.hero-credit{margin:0 auto!important;font-size:clamp(1rem,2vw,1.18rem)!important;color:#c6d5e7!important}.accent-name{color:#68ead9;background:linear-gradient(90deg,#64e7d6,#a2f5e7);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;white-space:nowrap}.hero-description{max-width:760px;margin:10px auto 0!important;font-size:.98rem!important;color:var(--muted)!important}.accent-brand{color:#7fe9dc;font-size:1.02em}.footer{background:linear-gradient(180deg,transparent,#0d1727a8);padding:25px 0 30px}.footer-inner{display:grid;justify-content:center;text-align:center;gap:5px}.footer-line{margin:0}.help-wrap{padding-bottom:8px}.help-panel{text-align:center;background:linear-gradient(135deg,#14253a,#101a2b);border-color:#2b465a}.help-panel h2{justify-content:center}.help-panel p{max-width:720px;margin:0 auto 12px}.timeline-card{grid-template-columns:minmax(76px,92px) minmax(0,1fr)}.timeline-meta span{overflow-wrap:anywhere}.schedule-day{padding:7px 10px;border-radius:9px;background:#12313a;border-inline-start:3px solid var(--teal)}
+    @media(max-width:820px){.grid{grid-template-columns:1fr}.grid .sidebar{grid-row:1}.courses{grid-template-columns:1fr 1fr}.admin-grid{grid-template-columns:1fr}}
+    @media(max-width:560px){.hero{padding-inline:6px}.hero:before{inset:8px 0 0;border-radius:20px}.hero h1{font-size:1.55rem;line-height:1.5}.hero-credit{font-size:.98rem!important}.hero-description{font-size:.9rem!important}.timeline-card{grid-template-columns:70px minmax(0,1fr);gap:9px;padding:11px}.wrap{width:min(100% - 20px,1180px)}.nav-inner{align-items:flex-start}.brand{font-size:1.05rem}.brand-mark{width:38px;height:38px}.nav .btn{padding:9px 10px;font-size:.82rem}.hero{padding-top:25px}.panel{padding:14px}.filters{grid-template-columns:1fr}.courses{grid-template-columns:1fr}.admin-form .row{grid-template-columns:1fr}.modal{padding:9px}.modal-box{padding:13px}.admin-item{align-items:flex-start;flex-direction:column}.admin-item-actions{width:100%}.admin-item-actions .btn{flex:1}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+      .analytics-strip{margin:0 auto 8px}.analytics-shell{border:1px solid #27445a;background:linear-gradient(120deg,#102b3b,#111b2d 60%,#14213a);border-radius:17px;padding:14px 16px;display:grid;grid-template-columns:minmax(180px,.75fr) 2fr;gap:14px;align-items:center;box-shadow:0 10px 28px #0002}.analytics-heading{display:flex;align-items:center;gap:10px;font-weight:800}.analytics-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#123b43;color:#7af0df;font-size:1.15rem}.analytics-subtitle{display:block;font-size:.78rem;color:var(--muted);font-weight:500}.analytics-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.analytics-metric{min-width:0;border:1px solid #263a50;border-radius:12px;padding:9px 12px;background:#091523b8}.analytics-metric-label{display:flex;align-items:center;gap:6px;color:#b8c8da;font-size:.8rem;font-weight:700}.analytics-metric-value{display:block;margin-top:2px;color:#8cf1e4;font-size:1.45rem;font-weight:800;line-height:1.35;font-variant-numeric:tabular-nums}.analytics-note{grid-column:1/-1;margin:0;color:var(--muted);font-size:.73rem;line-height:1.5}.analytics-admin{margin-bottom:14px}.analytics-admin .analytics-shell{grid-template-columns:1fr;padding:13px}.analytics-admin .analytics-heading{font-size:.95rem}.analytics-admin .analytics-metric-value{font-size:1.2rem}.analytics-updated{font-size:.72rem;color:var(--muted);font-weight:500;margin-inline-start:auto}@media(max-width:760px){.analytics-shell{grid-template-columns:1fr;gap:10px}.analytics-heading{font-size:.94rem}.analytics-metrics{gap:7px}.analytics-metric{padding:8px}.analytics-metric-label{font-size:.72rem;gap:4px}.analytics-metric-value{font-size:1.25rem}.analytics-note{font-size:.7rem}}@media(max-width:390px){.analytics-metric-label{display:block}.analytics-metric-value{font-size:1.1rem}}
+    /* Weekly fixed schedule is a compact reference, separate from today's schedule and tomorrow's agenda. */
+    .weekly-reference{border:0}.weekly-reference-summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;min-height:44px}.weekly-reference-summary::-webkit-details-marker{display:none}.weekly-reference-icon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:10px;background:#12313a;color:#72e4d5}.weekly-reference-title{font-weight:800;flex:1;min-width:0}.weekly-reference-count{white-space:nowrap;border:1px solid #28475a;background:#102733;color:#a3eee4;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:800}.weekly-reference-hint{font-size:.74rem;color:var(--muted);white-space:nowrap}.weekly-reference-summary:after{content:'+';font-size:1.2rem;color:var(--teal);margin-inline-start:2px}.weekly-reference[open]>.weekly-reference-summary:after{content:'−'}.weekly-reference-content{padding-top:10px;border-top:1px solid var(--line);margin-top:8px}.weekly-reference-description{margin:0 0 10px;line-height:1.6}.weekly-day-picker{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 8px;scrollbar-width:thin}.weekly-day-button{flex:0 0 auto;display:grid;gap:0;min-width:62px;border:1px solid #263950;border-radius:10px;padding:6px 9px;background:#0b1728;color:var(--text);font-size:.78rem;font-weight:700;text-align:center}.weekly-day-button small{font-size:.68rem;color:var(--muted);font-weight:600}.weekly-day-button[aria-pressed="true"]{border-color:#39b9ad;background:#12353c;box-shadow:inset 0 0 0 1px #39b9ad;color:#a7f7eb}.weekly-day-button[aria-pressed="true"] small{color:#a7f7eb}.weekly-public{display:grid;gap:8px}.weekly-public-day{display:grid;gap:7px}.weekly-public-day .schedule-day{margin:0 0 2px;font-size:.88rem}.weekly-public-day .timeline{gap:6px}.weekly-public-day .timeline-card{padding:9px 10px;grid-template-columns:minmax(68px,78px) minmax(0,1fr);gap:9px;box-shadow:none;border-radius:11px}.weekly-public-day .timeline-time{font-size:.76rem;padding:6px 3px}.weekly-public-day .timeline-title{font-size:.9rem}.weekly-public-day .timeline-meta{font-size:.76rem;margin-top:3px}
+    @media(max-width:420px){.weekly-reference-summary{gap:6px}.weekly-reference-hint{display:none}.weekly-reference-count{font-size:.68rem;padding:3px 6px}.weekly-day-button{min-width:58px;padding:6px 7px}}
+    /* Compact academic file accordions: Arabic RTL, keyboard-friendly native details. */
+    .courses{grid-template-columns:1fr;gap:9px}.course-accordion{border:1px solid #25384f;border-radius:13px;background:linear-gradient(135deg,#0d192a,#0a1423);overflow:hidden;min-width:0}.course-summary{display:flex;align-items:center;gap:10px;list-style:none;cursor:pointer;padding:12px 14px;min-height:58px}.course-summary::-webkit-details-marker,.file-group-summary::-webkit-details-marker{display:none}.course-summary:after{content:'⌄';margin-inline-start:auto;color:var(--teal);font-size:1.2rem;transition:transform .18s ease}.course-accordion[open]>.course-summary:after{transform:rotate(180deg)}.course-summary-main{min-width:0;flex:1}.course-title{font-weight:800;line-height:1.45;overflow-wrap:anywhere}.course-subtitle{font-size:.78rem;color:var(--muted);margin-top:2px}.course-count{display:inline-flex;align-items:center;justify-content:center;min-width:31px;height:28px;padding:0 8px;border-radius:9px;background:#12353c;border:1px solid #24545a;color:#9af0e4;font-size:.78rem;font-weight:800}.course-content{padding:0 10px 10px;border-top:1px solid #1d2d42}.file-group{margin-top:8px;border:1px solid #26374d;border-radius:10px;overflow:hidden;background:#0a1422}.file-group-summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:9px 11px;font-size:.88rem;font-weight:800;background:#101e30}.file-group-summary:after{content:'+';margin-inline-start:auto;color:var(--teal);font-size:1.05rem}.file-group[open]>.file-group-summary:after{content:'−'}.file-group-count{font-size:.72rem;color:var(--muted);font-weight:600}.file-list{padding:7px;gap:6px}.file-link{padding:8px 9px;font-size:.88rem}.file-meta-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.file-meta-tags .tag{font-size:.68rem;padding:2px 7px}.course-empty{padding:12px;color:var(--muted);font-size:.86rem}.latest-file-link{display:grid;gap:4px}.latest-file-meta{font-size:.76rem;color:var(--muted)}.announcement-card{padding:11px 12px;background:#0a1322;border:1px solid #1c2a40;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.announcement-date{display:block;margin-top:5px;color:var(--muted);font-size:.73rem}
+    @media(max-width:760px){.courses{grid-template-columns:1fr}.course-summary{padding:11px}.course-content{padding-inline:8px}.file-link{font-size:.84rem}}
+  </style>
 </head>
-
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-
-    <!-- شريط الإشعارات العلوي الذكي المتحرك -->
-    <div
-        class="bg-gradient-to-r from-teal-500 to-indigo-600 text-slate-950 text-center py-2 px-4 text-xs font-bold shadow-md">
-        <i class="fa-solid fa-shield-halved animate-pulse ml-2"></i> <span id="notificationBar">تنبيه أمني: تم تشفير
-            المنظومة وربط قفل لوحة التحكم الخاص بالمندوب بنجاح!</span>
+<body>
+  <div class="topline" id="notificationBar" role="status"><span aria-hidden="true">✦</span> منصة أكاديمية موحّدة لمقررات الدفعة وجداولها وملفاتها</div>
+  <nav class="nav"><div class="wrap nav-inner">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">EH</div><div>EduHub<small>بوابة دفعة هندسة البرمجيات</small></div></div>
+    <button class="btn btn-primary" id="adminOpenBtn" type="button">🔐 لوحة الإدارة</button>
+  </div></nav>
+  <header class="wrap hero"><div class="hero-mark" aria-hidden="true">✦ بوابتك الأكاديمية</div><h1>البوابة الأكاديمية الشاملة لدفعة هندسة البرمجيات</h1><p class="hero-credit">تطوير وتنسيق وتأمين المندوب المطور: <strong class="accent-name">أيمن جران</strong></p><p class="hero-description">مقررات الدفعة وملفاتها وجداولها الأكاديمية، منظمة في مساحة واحدة وسهلة الوصول من الهاتف والكمبيوتر.</p></header>
+  <main class="wrap grid">
+    <div class="stack">
+      <section class="panel"><h2><span>▤</span> أحدث الملفات</h2><div id="latestFilesContainer" class="list"><div class="empty">جارٍ تحميل الملفات…</div></div></section>
+      <section class="panel"><h2><span>▦</span> المقررات والملفات</h2>
+        <div class="filters">
+          <div class="field"><label for="searchInput">بحث</label><input id="searchInput" type="search" placeholder="ابحث عن مقرر أو ملف…" autocomplete="off"></div>
+          <div class="field"><label for="semesterFilter">الفصل الدراسي</label><select id="semesterFilter"><option value="الترم الأول">الترم الأول</option><option value="الترم الثاني" selected>الترم الثاني</option></select></div>
+          <div class="field"><label for="categoryFilter">نوع الملف</label><select id="categoryFilter"><option value="">كل الأنواع</option><option>محاضرات</option><option>ملخصات</option><option>نماذج</option><option>تكليفات</option><option>مراجع</option></select></div>
+        </div>
+        <div id="coursesContainer" class="courses" aria-live="polite"><div class="empty">جارٍ تحميل المقررات…</div></div>
+      </section>
+      <section class="panel"><h2><span>🔒</span> خصوصية الدرجات</h2><div class="grades-private"><span aria-hidden="true">🔐</span><div><strong>كشوف الدرجات ليست عامة.</strong><div class="small">تم إيقاف عرض أسماء الطلاب ودرجاتهم للزوار. الوصول إليها محصور بلوحة الإدارة المصرّح بها.</div></div></div></section>
     </div>
+    <aside class="stack sidebar">
+      <section class="panel"><h2><span>◉</span> الإعلانات والتعميمات</h2><div id="announcementsContainer" class="list"><div class="empty">جارٍ تحميل الإعلانات…</div></div></section>
+      <section class="panel"><h2><span>☀</span> محاضرات اليوم <small id="todayDateLabel" class="muted small" style="font-weight:500;margin-inline-start:auto"></small></h2><div id="todayScheduleContainer" class="timeline"><div class="empty">جارٍ تحميل جدول اليوم…</div></div></section>
+      <section class="panel"><h2><span>▦</span> أجندة الغد <small id="tomorrowDateLabel" class="muted small" style="font-weight:500;margin-inline-start:auto"></small></h2><div id="agendaContainer" class="timeline"><div class="empty">جارٍ تحميل الأجندة…</div></div></section>
+      <section class="panel weekly-reference-panel"><details id="weeklyReferenceDetails" class="weekly-reference"><summary class="weekly-reference-summary"><span class="weekly-reference-icon" aria-hidden="true">🗓</span><span class="weekly-reference-title">الجدول الأسبوعي الثابت</span><span id="weeklyLectureCount" class="weekly-reference-count">— محاضرة</span><span class="weekly-reference-hint">للمراجعة</span></summary><div class="weekly-reference-content"><p class="small muted weekly-reference-description">جدول مرجعي مختصر؛ اختر يومًا لعرض محاضراته. محاضرات اليوم وأجندة الغد ظاهرتان بشكل مستقل أعلاه.</p><div id="weeklyDayPicker" class="weekly-day-picker" role="group" aria-label="اختر يومًا من الجدول الأسبوعي"></div><div id="weeklyPublicScheduleContainer" class="weekly-public"><div class="empty">جارٍ تحميل الجدول الأسبوعي…</div></div></div></details></section>
+      <section class="panel"><h2><span>◷</span> الاختبار القادم</h2><div id="examContainer" class="list"><div class="empty">جارٍ تحميل بيانات الاختبار…</div></div></section>
+      
+    </aside>
+  </main>
+  <section class="wrap help-wrap" aria-labelledby="helpHeading"><div class="panel help-panel"><h2 id="helpHeading"><span>ⓘ</span> المساعدة والدعم</h2><p class="small muted">إذا كان رابط ملف لا يعمل، أو كان مقرر غير موجود، يمكنك إعادة تحميل المحتوى أو التواصل مع إدارة المنصة لتحديثه.</p><button class="btn btn-primary" id="reloadBtn" type="button">↻ إعادة تحميل المحتوى</button></div></section>
+  <footer class="footer"><div class="wrap footer-inner"><p class="footer-line">© 2026 جميع الحقوق محفوظة لمنصة <strong class="accent-brand">EduHub</strong></p><p class="footer-line">تطوير وبرمجة وتأمين المندوب: <strong class="accent-name">أيمن جران</strong></p></div></footer>
 
-    <!-- شريط القيادة العلوي -->
-    <nav class="bg-slate-950/80 sticky top-0 z-40 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <i class="fa-solid fa-terminal text-2xl text-teal-400"></i>
-                <span class="text-xl font-bold tracking-wider text-white">EduHub <span
-                        class="text-xs text-teal-400 font-mono">Secured v2.0</span></span>
+  <div id="adminModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="modal-box"><div class="modal-head"><div><h2 id="adminTitle" style="margin:0">لوحة إدارة EduHub</h2><div class="small muted">تُنفّذ جميع الصلاحيات على الخادم بعد التحقق من الرمز.</div></div><button class="btn" id="adminCloseBtn" type="button" aria-label="إغلاق لوحة الإدارة">✕ إغلاق</button></div>
+      <div id="adminLogin" class="admin-section"><h3>تسجيل دخول المشرف</h3><form id="adminLoginForm" class="admin-form"><div class="field"><label for="adminTokenInput">رمز الإدارة</label><input id="adminTokenInput" type="password" autocomplete="current-password" required placeholder="أدخل الرمز الذي ضُبط على الخادم"></div><button class="btn btn-primary" type="submit">التحقق وفتح الإدارة</button></form><p class="small muted">لا يوجد رمز افتراضي داخل ملفات الموقع. اضبط ADMIN_TOKEN في إعدادات الخادم.</p></div>
+      <div id="adminWorkspace" class="hidden">
+        <div class="admin-actions" style="margin-bottom:12px"><button class="btn btn-sm" id="refreshAdminBtn" type="button">تحديث البيانات</button><button class="btn btn-sm" id="logoutBtn" type="button">تسجيل الخروج</button><span id="onlineCount" class="tag">المتصلون: —</span></div>
+        <div id="adminStatus" class="status" role="status"></div>
+        <section class="analytics-admin" aria-label="إحصاءات استخدام المنصة في لوحة الإدارة">
+          <div class="analytics-shell">
+            <div class="analytics-heading"><span class="analytics-icon" aria-hidden="true">📈</span><div>تحليلات الاستخدام <span class="analytics-subtitle">إحصاءات مجمّعة دون عرض معرّفات المستخدمين</span></div><span id="analyticsAdminUpdated" class="analytics-updated">تحديث تلقائي</span></div>
+            <div class="analytics-metrics" aria-live="polite" aria-atomic="true">
+              <div class="analytics-metric"><span class="analytics-metric-label">👥 إجمالي المستخدمين</span><strong class="analytics-metric-value" id="adminAnalyticsUniqueUsers">—</strong></div>
+              <div class="analytics-metric"><span class="analytics-metric-label">🟢 النشطون اليوم</span><strong class="analytics-metric-value" id="adminAnalyticsTodayActive">—</strong></div>
+              <div class="analytics-metric"><span class="analytics-metric-label">↗ إجمالي الزيارات</span><strong class="analytics-metric-value" id="adminAnalyticsTotalVisits">—</strong></div>
             </div>
-            <button onclick="promptAdminAccess()"
-                class="text-xs bg-indigo-950 hover:bg-indigo-900 border border-indigo-700 px-4 py-2 rounded-xl text-teal-300 font-bold transition shadow-sm">
-                <i class="fa-solid fa-lock-open ml-1"></i> بوابتي الأمنية (المندوب)
-            </button>
+          </div>
+        </section>
+        <div class="admin-grid">
+          <section class="admin-section"><h3>إضافة فصل دراسي</h3><form id="semesterForm" class="admin-form"><input name="name" required placeholder="اسم الفصل، مثال: الترم الثاني"><input name="academic_year" placeholder="العام الدراسي (اختياري)"><button class="btn btn-primary" type="submit">إضافة الفصل</button></form><div id="semesterAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>إضافة مقرر</h3><form id="courseForm" class="admin-form"><input name="name" required placeholder="اسم المقرر"><input name="professor" placeholder="اسم الدكتور / المحاضر"><select name="semester_name" class="semesterChoices" required></select><label class="small"><input type="checkbox" name="has_practical" style="width:auto"> يحتوي على قسم عملي</label><button class="btn btn-primary" type="submit">إضافة المقرر</button></form><div id="courseAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>إضافة ملف أو رابط</h3><form id="fileForm" class="admin-form"><div class="row"><select name="semester_name" class="semesterChoices" required></select><select name="course_name" id="fileCourseChoice" required></select></div><div class="row"><select name="type_section"><option>نظري</option><option>عملي</option><option>عام</option></select><select name="file_category"><option>محاضرات</option><option>ملخصات</option><option>نماذج</option><option>تكليفات</option><option>مراجع</option></select></div><input name="title" required placeholder="عنوان الملف"><input name="file_url" type="url" required placeholder="رابط يبدأ بـ https:// أو http://"><button class="btn btn-primary" type="submit">حفظ الملف</button></form><div id="fileAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>إضافة إعلان</h3><form id="announcementForm" class="admin-form"><input name="content" required maxlength="2000" placeholder="نص الإعلان"><button class="btn btn-primary" type="submit">نشر الإعلان</button></form><div id="announcementAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>📅 إعداد فترة الفصل الدراسي</h3><p class="small muted">يتكرر الجدول الأسبوعي تلقائيًا ضمن هذه الفترة. حدّد تاريخ البداية والنهاية، والبيانات محفوظة في قاعدة البيانات.</p><form id="scheduleSettingsForm" class="admin-form"><div class="row"><div class="field"><label for="scheduleStart">بداية الفصل</label><input id="scheduleStart" name="semester_start" type="date" required></div><div class="field"><label for="scheduleEnd">نهاية الفصل</label><input id="scheduleEnd" name="semester_end" type="date" required></div></div><button class="btn btn-primary" type="submit">حفظ فترة الفصل</button></form></section>
+          <section class="admin-section"><h3>🗓️ الجدول الأسبوعي الثابت</h3><p class="small muted">أضف كل محاضرة مرة واحدة فقط؛ ستظهر تلقائيًا في يومها طوال الفصل.</p><form id="weeklyLectureForm" class="admin-form"><div class="field"><label for="lectureWeekday">يوم المحاضرة</label><select id="lectureWeekday" name="weekday" required><option value="0">الاثنين</option><option value="1">الثلاثاء</option><option value="2">الأربعاء</option><option value="3">الخميس</option><option value="4">الجمعة</option><option value="5">السبت</option><option value="6">الأحد</option></select></div><input name="title" required maxlength="150" placeholder="اسم المقرر / المحاضرة"><div class="row"><input name="start_time" type="time" aria-label="وقت البداية"><input name="end_time" type="time" aria-label="وقت النهاية"></div><input name="location" maxlength="120" placeholder="القاعة أو المكان (اختياري)"><input name="notes" maxlength="250" placeholder="ملاحظة (اختياري)"><button class="btn btn-primary" type="submit">إضافة إلى الجدول الأسبوعي</button></form><div id="weeklyScheduleAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>✏️ استثناء ليوم واحد — أجندة الغد</h3><p class="small muted">يعدّل هذا التغيير التاريخ المحدد فقط، ولا يغيّر الجدول الأسبوعي للأيام الأخرى.</p><form id="scheduleOverrideForm" class="admin-form"><div class="field"><label for="overrideDate">تاريخ الاستثناء</label><input id="overrideDate" name="agenda_date" type="date" required></div><div class="field"><label for="overrideLectureSelect">المحاضرة التي تريد تعديلها</label><select id="overrideLectureSelect"><option value="">بدون تعديل محاضرة</option></select></div><input name="title" placeholder="الاسم الجديد للمحاضرة (اختياري)"><div class="row"><input name="start_time" type="time" aria-label="وقت البداية الجديد"><input name="end_time" type="time" aria-label="وقت النهاية الجديد"></div><input name="location" placeholder="المكان الجديد (اختياري)"><textarea name="note" rows="2" maxlength="500" placeholder="ملاحظة خاصة بهذا اليوم فقط"></textarea><button class="btn btn-primary" type="submit">حفظ استثناء هذا اليوم</button><button class="btn" id="clearOverrideBtn" type="button">إلغاء الاستثناء وإعادة الجدول الأصلي</button></form></section>
+          <section class="admin-section"><h3>أجندة قديمة (توافق رجعي)</h3><p class="small muted">هذا النموذج للتوافق مع البيانات السابقة فقط؛ محاضرات اليوم وأجندة الغد تُستخرجان تلقائيًا من الجدول الأسبوعي الثابت والاستثناءات المؤرخة.</p><form id="agendaForm" class="admin-form"><div class="row"><input name="lecture_1" placeholder="المحاضرة الأولى"><input name="time_1" placeholder="وقتها"></div><div class="row"><input name="lecture_2" placeholder="المحاضرة الثانية"><input name="time_2" placeholder="وقتها"></div><input name="status_msg" placeholder="ملاحظة أو حالة اليوم"><button class="btn btn-primary" type="submit">حفظ الأجندة القديمة</button></form></section>
+          <section class="admin-section"><h3>تحديث الاختبار القادم</h3><form id="examForm" class="admin-form"><input name="course_name" required placeholder="اسم المقرر"><input name="exam_date_text" required placeholder="التاريخ المعروض"><input name="exam_time" required placeholder="الوقت"><input name="timestamp" type="datetime-local" required><button class="btn btn-primary" type="submit">حفظ بيانات الاختبار</button></form></section>
+          <section class="admin-section"><h3>درجات الطلاب — وصول إداري فقط</h3><form id="gradeForm" class="admin-form"><input name="student_name" required placeholder="اسم الطالب"><input name="course_name" required placeholder="المقرر"><div class="row"><input name="theory_grade" type="number" min="0" max="100" step="0.1" required placeholder="النظري"><input name="practical_grade" type="number" min="0" max="100" step="0.1" value="0" required placeholder="العملي"></div><button class="btn btn-primary" type="submit">إضافة سجل درجة</button></form><div id="gradeAdminList" class="admin-items"></div></section>
+          <section class="admin-section"><h3>الأرشيف والاستعادة</h3><p class="small muted">العناصر المؤرشفة لا تُحذف نهائيًا، ويمكن إعادتها من هنا.</p><button class="btn" id="loadArchiveBtn" type="button">عرض الأرشيف</button><div id="archiveAdminList" class="admin-items"></div></section>
         </div>
-    </nav>
-
-    <!-- الهيدر الرئيسي الفخم -->
-    <header class="max-w-7xl mx-auto px-4 pt-10 pb-6 text-center">
-        <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">البوابة الأكاديمية الشاملة لدفعة هندسة البرمجيات</h1>
-        <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">تطوير وتنسيق وتأمين المندوب المطور: <span
-                class="text-teal-400 font-bold">أيمن جران</span></p>
-        <!-- شريط المهام السريع - محدث -->
-    </header>
-
-    <!-- المحتوى الرئيسي للموقع -->
-    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- لوحة الإعلانات والملفات الجانبية -->
-        <div class="space-y-6 lg:col-span-1">
-            <section class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-amber-400 font-bold text-sm mb-3 flex items-center gap-2"><i
-                        class="fa-solid fa-bullhorn"></i> آخر التعميمات والإعلانات</h3>
-                <div id="announcementsContainer" class="space-y-2.5 text-xs text-slate-300 max-h-60 overflow-y-auto">
-                    <p class="text-slate-500 italic">لا توجد إعلانات معروضة حالياً.</p>
-                </div>
-            </section>
-
-            <!-- === قسم الأجندة والاختبارات (Tailwind CSS) === -->
-        <div class="flex flex-col md:flex-row gap-6 mb-8 w-full max-w-4xl mx-auto px-4">
-            
-            <!-- بطاقة الأجندة -->
-            <div class="flex-1 bg-slate-900/80 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                <h3 class="text-blue-400 font-bold text-lg mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-day"></i> أجندة الغد
-                </h3>
-                <ul id="agenda-container" class="space-y-3 text-slate-300 text-sm">
-                    <li><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل الأجندة...</li>
-                </ul>
-            </div>
-
-            <!-- بطاقة الاختبار -->
-            <div id="exam-card" class="flex-1 bg-slate-900/80 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500"></div>
-                <h3 class="text-red-400 font-bold text-lg mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-stopwatch"></i> الاختبار القادم
-                </h3>
-                <div id="exam-container" class="space-y-2 text-slate-300 text-sm">
-                    <p><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل بيانات الاختبار...</p>
-                </div>
-            </div>
-
-        </div>
-            <section class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-teal-400 font-bold text-sm mb-3 flex items-center gap-2"><i
-                        class="fa-solid fa-folder-open"></i> أحدث الملفات المرفوعة</h3>
-                <div id="latestFilesContainer" class="space-y-2 text-xs max-h-60 overflow-y-auto">
-                    <p class="text-slate-500 italic">لا توجد ملفات جديدة مرفوعة مؤخراً.</p>
-                </div>
-            </section>
-        </div>
-
-        <!-- كشوفات الدرجات والمواد الدراسية الثمانية المعتمدة -->
-        <div class="lg:col-span-3 space-y-8">
-            <section class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-xl">
-                <h3 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i
-                        class="fa-solid fa-square-poll-horizontal text-indigo-400"></i> كشوفات درجات الطلاب العامة</h3>
-                <div class="overflow-x-auto rounded-xl border border-slate-800">
-                    <table class="w-full text-right border-collapse text-xs md:text-sm">
-                        <thead>
-                            <tr class="bg-slate-900 text-slate-300 border-b border-slate-800">
-                                <th class="p-3">اسم الطالب</th>
-                                <th class="p-3">المادة الدراسية</th>
-                                <th class="p-3">درجة النظري</th>
-                                <th class="p-3">درجة العملي</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gradesTableBody" class="divide-y divide-slate-800/50 text-slate-300">
-                            <tr>
-                                <td colspan="4" class="p-4 text-center text-slate-500 italic">جاري تحميل البيانات...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <section>
-                <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2"><i
-                        class="fa-solid fa-cubes text-teal-400"></i> المقررات الدراسية الحالية</h3>
-                <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-        </div>
-    </main>
-
-    <!-- لوحة التحكم الإدارية والأمنية الكبرى للمندوب ايمن جران -->
-    <div id="adminModal"
-        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div
-            class="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleAdminModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white"><i
-                    class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold text-teal-400 mb-4"><i class="fa-solid fa-shield-halved ml-1"></i> لوحة
-                الإدارة والتحكم الأمنية المتقدمة لـ أيمن جران</h3>
-
-            <div class="space-y-6 text-xs md:text-sm">
-                <!-- جرد وإزالة المتواجدين بالنظام -->
-                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
-                    <h4 class="font-bold text-white mb-2"><i class="fa-solid fa-users-gear text-indigo-400 ml-1"></i>
-                        إدارة وإزالة المتواجدين والمسجلين بالنظام</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right text-xs">
-                            <thead>
-                                <tr class="text-slate-500 border-b border-slate-800">
-                                    <th class="pb-2">اسم الطالب المتواجد</th>
-                                    <th class="pb-2 text-center">الإجراء والحذف</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminStudentsList" class="divide-y divide-slate-800 text-slate-300">
-                                <!-- سيمتلئ برمجياً وبجانب كل اسم زر حذف وتدمير للبيانات -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- إضافة تعميم للطلاب -->
-                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
-                    <label class="block font-bold text-slate-300 mb-1.5">إضافة تعميم وعاجل جديد وشريط الإشعارات</label>
-                    <div class="flex gap-2">
-                        <input id="annInput" type="text" placeholder="اكتب نص الإعلان هنا..."
-                            class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                        <button onclick="submitAnnouncement()"
-                            class="bg-indigo-600 hover:bg-indigo-700 px-4 rounded-lg text-white font-bold text-xs">نشر
-                            وتنبيه</button>
-                    </div>
-                </div>
-
-                <!-- ========================================== -->
-                <!-- قسم تحديث الأجندة والاختبارات (للمندوب فقط) -->
-                <!-- ========================================== -->
-
-                <!-- === قسم الأجندة === -->
-                <div class="admin-panel-section">
-                    <h2><i class="fa-solid fa-calendar-day"></i> تحديث أجندة الغد</h2>
-                    <div class="input-group">
-                        <input type="text" id="agenda-lec1" placeholder="المحاضرة الأولى (مثال: OOP)">
-                        <input type="text" id="agenda-time1" placeholder="وقت المحاضرة الأولى (مثال: 10:00 ص)">
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="agenda-lec2" placeholder="المحاضرة الثانية (مثال: Web)">
-                        <input type="text" id="agenda-time2" placeholder="وقت المحاضرة الثانية (مثال: 12:00 م)">
-                    </div>
-                    <input type="text" id="agenda-status" placeholder="حالة اليوم (مثال: لا توجد اختبارات أو تسليمات)">
-                    
-                    <!-- حقل الرمز السري للأجندة (لاحظي الـ id الجديد) -->
-                    <input type="password" id="publishTokenAgenda" placeholder="🔑 أدخلي الرمز السري للتأكيد" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #475569;">
-                    
-                    <button onclick="submitAgenda()" class="admin-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الأجندة</button>
-                </div>
-
-                <!-- === قسم الاختبارات === -->
-                <div class="admin-panel-section exam-section" style="margin-top: 30px;">
-                    <h2><i class="fa-solid fa-stopwatch"></i> تحديث الاختبار القادم</h2>
-                    <input type="text" id="exam-course" placeholder="اسم مادة الاختبار (مثال: قواعد البيانات)">
-                    <input type="text" id="exam-date" placeholder="تاريخ الاختبار نصياً (مثال: الخميس, 30 يوليو 2026)">
-                    <input type="text" id="exam-time" placeholder="وقت الاختبار (مثال: 09:00 صباحاً)">
-                    
-                    <label for="exam-timestamp" style="color:#94a3b8; display:block; margin-top:10px;">وقت المؤقت التنازلي (لعمل الإنذار الأحمر):</label>
-                    <input type="datetime-local" id="exam-timestamp">
-                    
-                    <!-- حقل الرمز السري للاختبار (لاحظي الـ id الجديد) -->
-                    <input type="password" id="publishTokenExam" placeholder="🔑 أدخلي الرمز السري للتأكيد" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #475569;">
-                    
-                    <button onclick="submitExam()" class="admin-btn alert-btn"><i class="fa-solid fa-cloud-arrow-up"></i> نشر الاختبار</button>
-                </div>           
-
-                <!-- رفع ملف وتكليف ومواد -->
-                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
-                    <label class="block font-bold text-slate-300 mb-1.5">رفع وتعميم كتل المحاضرات والنماذج</label>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <select id="fileCourse"
-                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                            <option value="قواعد البيانات">قواعد البيانات</option>
-                            <option value="مبدأ تراسل بيانات وشبكات">مبدأ تراسل بيانات وشبكات</option>
-                            <option value="الصراع العربي الاسرائلي">الصراع العربي الاسرائلي</option>
-                            <option value="جبر خطي">جبر خطي</option>
-                            <option value="احصاء واحتمالات">احصاء واحتمالات</option>
-                            <option value="البرمجة الموجهه بالكائنات">البرمجة الموجهه بالكائنات</option>
-                            <option value="هندسة برمجيات">هندسة برمجيات</option>
-                            <option value="تطوير تطبيقات الويب">تطوير تطبيقات الويب</option>
-                        </select>
-                        <select id="fileSection"
-                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                            <option value="نظري">قسم النظري</option>
-                            <option value="عملي">قسم العملي</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <select id="fileCategory"
-                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                            <option value="محاضرات">محاضرات</option>
-                            <option value="ملخصات">ملخصات</option>
-                            <option value="نماذج">نماذج سابقة</option>
-                        </select>
-                        <input id="fileTitle" type="text" placeholder="العنوان (مثال: نموذج اختبار نصف الترم)"
-                            class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                    </div>
-                    <input id="fileUrl" type="text" placeholder="رابط التحميل المباشر من جوجل درايف"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs mb-2">
-                    <button onclick="submitFile()"
-                        class="w-full bg-teal-500 text-slate-950 font-bold py-2 rounded-lg text-xs hover:bg-teal-400 transition">رفع
-                        وتعميم فوري</button>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+<script>
+(() => {
+  'use strict';
+  const API_URL = (window.EDUHUB_API_URL || document.querySelector('meta[name="eduhub-api-url"]')?.content || 'https://eduhub-backend-je8q.onrender.com').replace(/\/$/, '');
+  const DEFAULT_SEMESTER = 'الترم الثاني';
+  const FIRST_SEMESTER = 'الترم الأول';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  let adminToken = '';
+  let semesters = [];
+  let courses = [];
+  let files = [];
+  let announcements = [];
+  let grades = [];
+  let allAdminCourses = [];
+  let weeklyLectures = [];
+  let publicWeeklyLectures = [];
+  let tomorrowSchedule = null;
+  let overrideDaySchedule = null;
+  let examTimer = null;
+  function newAnalyticsId() {
+    if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+    const bytes = new Uint8Array(16);
+    if (window.crypto && typeof crypto.getRandomValues === 'function') crypto.getRandomValues(bytes);
+    else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = [...bytes].map(x => x.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  }
+  function storedAnalyticsId(storageName, key) {
+    try {
+      const storage = window[storageName];
+      const existing = storage.getItem(key);
+      if (existing && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(existing)) return existing;
+      const created = newAnalyticsId(); storage.setItem(key, created); return created;
+    } catch (_) { return newAnalyticsId(); }
+  }
+  const analyticsDeviceId = storedAnalyticsId('localStorage', 'eduhub_analytics_device_v1');
+  const analyticsSessionId = storedAnalyticsId('sessionStorage', 'eduhub_analytics_session_v1');
+  let analyticsHeartbeatBusy = false;
 
-        <!-- ================= الفوتر الاحترافي ================= -->
-        <footer class="mt-16 border-t border-slate-800 bg-slate-900/40 backdrop-blur-lg">
-            <div class="max-w-7xl mx-auto px-4 py-6">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    
-                    <!-- معلومات التطوير والحقوق -->
-                    <div class="text-center md:text-right">
-                        <p class="text-slate-400 text-sm">
-                            &copy; 2026 جميع الحقوق محفوظة لمنصة <span class="text-teal-400 font-bold">EduHub</span>
-                        </p>
-                        <p class="text-slate-500 text-xs mt-1">
-                            تطوير وبرمجة وتأمين المندوب: <span class="text-emerald-400 font-medium">أيمن جران</span>
-                        </p>
-                    </div>
-
-                    <!-- زر التواصل التفاعلي -->
-                    <div>
-                        <button onclick="toggleContactModal()" class="flex items-center gap-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-teal-600 hover:to-emerald-600 text-slate-300 hover:text-white border border-slate-700 hover:border-teal-500 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(20,184,166,0.4)] transform hover:-translate-y-1">
-                            <i class="fa-solid fa-headset"></i> تواصل مع المندوب
-                        </button>
-                    </div>
-                    
-                </div>
-            </div>
-        </footer>
-
-        <!-- ================= نافذة الدعم والتواصل (مخفية افتراضياً) ================= -->
-        <div id="contactModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300 opacity-0">
-            <!-- صندوق النافذة -->
-            <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-700 shadow-2xl relative transform scale-95 transition-transform duration-300" id="contactModalContent">
-                
-                <!-- رأس النافذة -->
-                <div class="border-b border-slate-800 p-5 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-envelope-open-text text-teal-400"></i> مركز المساعدة
-                    </h3>
-                    <button onclick="toggleContactModal()" class="text-slate-400 hover:text-white transition-colors">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
-                </div>
-                
-                <!-- محتوى النافذة (أزرار التواصل) -->
-                <div class="p-6 space-y-4">
-                    <p class="text-slate-300 text-sm leading-relaxed text-center mb-6">
-                        هل تواجه مشكلة تقنية في المنصة أو تحتاج لمساعدة في الملفات الأكاديمية؟ لا تتردد في التواصل.
-                    </p>
-                    
-                    <!-- زر واتساب -->
-                    <a href="https://wa.me/+967776609586" target="_blank" class="flex items-center justify-center gap-3 w-full bg-slate-800 hover:bg-[#25D366]/10 border border-slate-700 hover:border-[#25D366] text-slate-200 hover:text-[#25D366] p-3 rounded-xl transition-all group">
-                        <i class="fa-brands fa-whatsapp text-xl group-hover:scale-110 transition-transform"></i>
-                        <span class="font-medium">رسالة عبر واتساب</span>
-                    </a>
-
-                    <!-- زر تيليجرام -->
-                    <a href="https://t.me/Aiman_eng" target="_blank" class="flex items-center justify-center gap-3 w-full bg-slate-800 hover:bg-[#229ED9]/10 border border-slate-700 hover:border-[#229ED9] text-slate-200 hover:text-[#229ED9] p-3 rounded-xl transition-all group">
-                        <i class="fa-brands fa-telegram text-xl group-hover:scale-110 transition-transform"></i>
-                        <span class="font-medium">رسالة عبر تيليجرام</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-    <script>
-        const API_URL = "https://eduhub-backend-je8q.onrender.com";
-        let adminToken = ""; // يتم تخزين رمز الحماية هنا بعد التحقق بنجاح
-
-        const coursesList = [
-            { name: "قواعد البيانات", prof: "الدكتور احمد فؤاد", hasPractical: true },
-            { name: "مبدأ تراسل بيانات وشبكات", prof: "الدكتور بلال الفهيدي", hasPractical: true },
-            { name: "الصراع العربي الاسرائلي", prof: "الدكتور علي شرف الدين", hasPractical: false },
-            { name: "جبر خطي", prof: "الدكتور عبده العامري", hasPractical: false },
-            { name: "احصاء واحتمالات", prof: "الدكتور عابد الشميري", hasPractical: false },
-            { name: "البرمجة الموجهه بالكائنات", prof: "الدكتور فاروق الفهيدي", hasPractical: true },
-            { name: "هندسة برمجيات", prof: "الدكتور وديع القباطي", hasPractical: true },
-            { name: "تطوير تطبيقات الويب", prof: "الدكتوره وفاء النبهاني", hasPractical: true }
-        ];
-
-        // طلب إدخال رمز الأمان السري بشكل مشفر ومحمي للتحكم بالمنصة
-        function promptAdminAccess() {
-            const code = prompt("الرجاء إدخال رمز الأمان السري الخاص بك (كمندوب ومطور المنصة):");
-            if (code === "Ayman_Jarran_2026") {
-                adminToken = code;
-                alert("تم التحقق من هويتك بنجاح يا بشمهندس أيمن! جاري فتح اللوحة الفخمة والتحكم بالمتواجدين.");
-                toggleAdminModal();
-                loadAdminStudents();
-            } else if (code !== null) {
-                alert("رمز الأمان خاطئ تماماً! تم تسجيل محاولة الدخول غير المصرح بها لحماية المنظومة.");
-            }
-        }
-
-        function toggleAdminModal() {
-            document.getElementById("adminModal").classList.toggle("hidden");
-            document.getElementById("adminModal").classList.toggle("flex");
-        }
-
-        function renderCourses(allFiles = []) {
-            const container = document.getElementById("coursesContainer");
-            container.innerHTML = "";
-            coursesList.forEach(course => {
-                let courseId = course.name.replace(/\s+/g, '');
-                let html = `
-                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-bold text-white text-sm md:text-base">${course.name}</h4>
-                                <p class="text-xxs text-slate-500 mt-0.5"><i class="fa-solid fa-user-tie ml-1"></i> د. ${course.prof}</p>
-                            </div>
-                        </div>
-                        <div class="grid ${course.hasPractical ? 'grid-cols-2' : 'grid-cols-1'} gap-3 text-xs">
-                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800/80">
-                                <span class="font-bold text-indigo-400 block mb-2 border-b border-slate-800 pb-1"><i class="fa-solid fa-book ml-1"></i> القسم النظري</span>
-                                <div class="space-y-1.5 text-xxs text-slate-400" id="files-${courseId}-theory">لا توجد أوراق مرفوعة.</div>
-                            </div>`;
-                if (course.hasPractical) {
-                    html += `
-                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800/80">
-                                <span class="font-bold text-teal-400 block mb-2 border-b border-slate-800 pb-1"><i class="fa-solid fa-flask ml-1"></i> القسم العملي</span>
-                                <div class="space-y-1.5 text-xxs text-slate-400" id="files-${courseId}-practical">لا توجد معامل مرفوعة.</div>
-                            </div>`;
-                }
-                html += `</div></div>`;
-                container.innerHTML += html;
-            });
-
-            allFiles.forEach(file => {
-                let courseId = file.course_name.replace(/\s+/g, '');
-                let sectionType = file.type_section === "نظري" ? "theory" : "practical";
-                let targetId = `files-${courseId}-${sectionType}`;
-                let element = document.getElementById(targetId);
-                if (element) {
-                    if (element.innerText.includes("لا توجد")) element.innerHTML = "";
-                    element.innerHTML += `
-                        <a href="${file.file_url}" target="_blank" class="flex items-center justify-between p-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-lg text-slate-300 mb-1">
-                            <span><i class="fa-solid fa-file-pdf text-rose-500 ml-1"></i> [${file.file_category}] ${file.title}</span>
-                        </a>`;
-                }
-            });
-        }
-
-        async function loadAnnouncements() {
-            const res = await fetch(`${API_URL}/announcements`);
-            const data = await res.json();
-            const container = document.getElementById("announcementsContainer");
-            if (data.length > 0) {
-                container.innerHTML = "";
-                document.getElementById("notificationBar").innerText = `آخر إعلان وعاجل: ${data[0].content}`;
-                data.forEach(ann => {
-                    container.innerHTML += `<div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800/80 text-slate-300">${ann.content}</div>`;
-                });
-            }
-        }
-
-        async function loadGrades() {
-            const res = await fetch(`${API_URL}/grades`);
-            const data = await res.json();
-            const tbody = document.getElementById("gradesTableBody");
-            if (data.length > 0) {
-                tbody.innerHTML = "";
-                data.forEach(g => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-900/50 border-b border-slate-800/50">
-                            <td class="p-3 font-medium text-white">${g.student_name}</td>
-                            <td class="p-3 text-slate-400">${g.course_name}</td>
-                            <td class="p-3 text-indigo-400 font-bold">${g.theory_grade}</td>
-                            <td class="p-3 text-teal-400 font-bold">${g.practical_grade || '-'}</td>
-                        </tr>`;
-                });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-600 italic">لا توجد درجات مرصودة حالياً.</td></tr>`;
-            }
-        }
-
-async function submitAgenda() {
-    // السطر الجديد الذي يحل المشكلة: تعريف رابط السيرفر
-    const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
-    
-    const adminToken = document.getElementById("publishTokenAgenda").value;
-    
-    const agendaData = {
-        lecture_1: document.getElementById("agenda-lec1").value,
-        time_1: document.getElementById("agenda-time1").value,
-        lecture_2: document.getElementById("agenda-lec2").value,
-        time_2: document.getElementById("agenda-time2").value,
-        status_msg: document.getElementById("agenda-status").value
-    };
-
-    const response = await fetch(`${BASE_URL}/agenda/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${adminToken}`
-        },
-        body: JSON.stringify(agendaData)
+  function make(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    return node;
+  }
+  function empty(container, message, isError = false) {
+    container.replaceChildren(make('div', isError ? 'error' : 'empty', message));
+  }
+  async function api(path, options = {}) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    const headers = new Headers(options.headers || {});
+    if (adminToken) headers.set('Authorization', `Bearer ${adminToken}`);
+    if (options.body && !(options.body instanceof FormData)) headers.set('Content-Type', 'application/json');
+    try {
+      const response = await fetch(`${API_URL}${path}`, {...options, headers, signal: controller.signal});
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+      if (!response.ok) {
+        const detail = data && data.detail ? data.detail : `تعذر إكمال الطلب (HTTP ${response.status})`;
+        throw new Error(detail);
+      }
+      return data;
+    } catch (error) {
+      if (error.name === 'AbortError') throw new Error('انتهت مهلة الاتصال. تحقق من الشبكة وحاول مجددًا.');
+      if (error instanceof TypeError) throw new Error('تعذر الاتصال بالخادم. قد يكون متوقفًا أو أن رابط API غير صحيح.');
+      throw error;
+    } finally { clearTimeout(timeout); }
+  }
+  function showStatus(message, bad = false) {
+    const box = $('#adminStatus'); box.textContent = message; box.className = `status show${bad ? ' bad' : ''}`;
+  }
+  function safeExternalLink(url, title) {
+    const label = make('span', '', title);
+    let parsed;
+    try { parsed = new URL(String(url || '')); } catch (_) { parsed = null; }
+    if (!parsed || !['http:', 'https:'].includes(parsed.protocol)) {
+      const invalid = make('div', 'file-link');
+      invalid.append(label, make('small', 'muted', 'رابط غير صالح؛ يرجى مراجعة الإدارة.'));
+      return invalid;
+    }
+    const a = make('a', 'file-link');
+    a.href = parsed.href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    const icon = make('span', 'tag', 'فتح ↗');
+    a.append(label, icon); return a;
+  }
+  function semesterFromRoute() {
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    if (path === '/semester-1') return FIRST_SEMESTER;
+    if (path === '/semester-2') return DEFAULT_SEMESTER;
+    const requested = new URLSearchParams(window.location.search).get('semester');
+    return [FIRST_SEMESTER, DEFAULT_SEMESTER].includes(requested) ? requested : DEFAULT_SEMESTER;
+  }
+  function syncSemesterRoute() {
+    const path = currentSemester() === FIRST_SEMESTER ? '/semester-1' : '/semester-2';
+    if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+      if (window.location.pathname !== path || window.location.search) window.history.replaceState(null, '', path);
+    }
+  }
+  function currentSemester() { return $('#semesterFilter').value || DEFAULT_SEMESTER; }
+  function currentFilters() {
+    return {search: $('#searchInput').value.trim().toLocaleLowerCase(), category: $('#categoryFilter').value};
+  }
+  async function loadSemesters() {
+    try {
+      semesters = await api('/semesters');
+      const filter = $('#semesterFilter'); const prior = semesterFromRoute() || filter.value || DEFAULT_SEMESTER;
+      filter.replaceChildren();
+      semesters.forEach(s => filter.add(new Option(s.name, s.name)));
+      if (semesters.some(s => s.name === prior)) filter.value = prior;
+      else if (semesters.some(s => s.name === DEFAULT_SEMESTER)) filter.value = DEFAULT_SEMESTER;
+      else filter.value = semesters[0]?.name || '';
+      syncSemesterRoute();
+      $$('.semesterChoices').forEach(select => {
+        const selected = select.value;
+        select.replaceChildren(...semesters.map(s => new Option(s.name, s.name)));
+        if (semesters.some(s => s.name === selected)) select.value = selected;
+      });
+    } catch (e) { empty($('#coursesContainer'), `تعذر تحميل الفصول: ${e.message}`, true); }
+  }
+  function localDateString(dateObj = new Date()) {
+    const y = dateObj.getFullYear(); const m = String(dateObj.getMonth()+1).padStart(2,'0'); const d = String(dateObj.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+  function nextLocalDateString(offset = 1) { const d = new Date(); d.setDate(d.getDate()+offset); return localDateString(d); }
+  function formatArabicDate(value) { const d = new Date(`${value}T12:00:00`); return new Intl.DateTimeFormat('ar-YE',{weekday:'long',day:'numeric',month:'long'}).format(d); }
+  const categoryLabels = {
+    'محاضرات':'المحاضرات', 'ملخصات':'الملخصات', 'نماذج':'نماذج الاختبارات',
+    'تكليفات':'التكليفات والواجبات', 'مراجع':'المراجع والمصادر'
+  };
+  function fileSearchText(file) {
+    return [file.title,file.course_name,file.type_section,file.file_category].filter(Boolean).join(' ').toLocaleLowerCase();
+  }
+  function renderCourses() {
+    const container = $('#coursesContainer'); container.replaceChildren();
+    const filters = currentFilters();
+    const availableCourses = courses.filter(course => {
+      const courseFiles = files.filter(file => file.course_name === course.name);
+      const courseMatch = Boolean(filters.search) && `${course.name} ${course.professor || ''}`.toLocaleLowerCase().includes(filters.search);
+      const matchingFiles = courseFiles.filter(file => (!filters.category || file.file_category === filters.category) && (!filters.search || fileSearchText(file).includes(filters.search)));
+      return (!filters.search && !filters.category) || courseMatch || matchingFiles.length > 0;
     });
-
-    if (response.ok) {
-        alert("تم رفع أجندة الغد إلى السحابة بنجاح!");
-    } else {
-        alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
-    }
-}
-
-async function submitExam() {
-    // السطر الجديد الذي يحل المشكلة: تعريف رابط السيرفر
-    const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
-    
-    const adminToken = document.getElementById("publishTokenExam").value;
-    
-    const examData = {
-        course_name: document.getElementById("exam-course").value,
-        exam_date_text: document.getElementById("exam-date").value,
-        exam_time: document.getElementById("exam-time").value,
-        timestamp: document.getElementById("exam-timestamp").value
-    };
-
-    const response = await fetch(`${BASE_URL}/exam/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${adminToken}`
-        },
-        body: JSON.stringify(examData)
+    if (!availableCourses.length) { empty(container, 'لا توجد مقررات أو ملفات تطابق البحث والتصنيف المحددين.'); return; }
+    availableCourses.forEach(course => {
+      const courseFiles = files.filter(file => file.course_name === course.name && (!filters.category || file.file_category === filters.category) && (!filters.search || fileSearchText(file).includes(filters.search) || `${course.name} ${course.professor || ''}`.toLocaleLowerCase().includes(filters.search)));
+      const details = make('details','course-accordion');
+      if (filters.search) details.open = true;
+      const summary = make('summary','course-summary');
+      const main = make('div','course-summary-main');
+      main.append(make('div','course-title',course.name));
+      main.append(make('div','course-subtitle',course.professor ? `المحاضر: ${course.professor}` : 'ملفات المقرر وتصنيفاته'));
+      summary.append(make('span','course-count',String(courseFiles.length)),main);
+      details.append(summary);
+      const content = make('div','course-content');
+      if (!courseFiles.length) {
+        content.append(make('div','course-empty','لا توجد ملفات مطابقة لهذا المقرر حاليًا.'));
+      } else {
+        const sectionOrder = ['نظري','عملي','عام'];
+        const sectionNames = {'نظري':'المحتوى النظري','عملي':'المحتوى العملي','عام':'ملفات عامة'};
+        const sections = [...new Set([...sectionOrder.filter(type => courseFiles.some(file => (file.type_section || 'عام') === type)), ...courseFiles.map(file => file.type_section || 'عام').filter(type => !sectionOrder.includes(type))])];
+        sections.forEach(sectionName => {
+          const sectionFiles = courseFiles.filter(file => (file.type_section || 'عام') === sectionName);
+          if (!sectionFiles.length) return;
+          const sectionDetails = make('details','file-group');
+          if (filters.search && sectionFiles.some(file => fileSearchText(file).includes(filters.search))) sectionDetails.open = true;
+          const sectionSummary = make('summary','file-group-summary');
+          sectionSummary.append(make('span','',sectionNames[sectionName] || sectionName),make('span','file-group-count',`${sectionFiles.length} ملف`));
+          sectionDetails.append(sectionSummary);
+          const categories = [...new Set([...Object.keys(categoryLabels).filter(cat => sectionFiles.some(file => file.file_category === cat)), ...sectionFiles.map(file => file.file_category || 'غير مصنف').filter(cat => !Object.prototype.hasOwnProperty.call(categoryLabels,cat))])];
+          categories.forEach(category => {
+            const categoryFiles = sectionFiles.filter(file => (file.file_category || 'غير مصنف') === category);
+            if (!categoryFiles.length) return;
+            const categoryDetails = make('details','file-group');
+            if (filters.search && categoryFiles.some(file => fileSearchText(file).includes(filters.search))) categoryDetails.open = true;
+            const categorySummary = make('summary','file-group-summary');
+            categorySummary.append(make('span','',categoryLabels[category] || category),make('span','file-group-count',`${categoryFiles.length} ملف`));
+            categoryDetails.append(categorySummary);
+            const list = make('div','file-list');
+            categoryFiles.forEach(file => {
+              const link = safeExternalLink(file.file_url,file.title || 'ملف بدون عنوان');
+              const meta = make('div','file-meta-tags');
+              meta.append(make('span','tag',sectionNames[sectionName] || sectionName));
+              meta.append(make('span','tag',categoryLabels[category] || category));
+              const label = link.querySelector('span');
+              if (label) { const wrapper = make('div',''); wrapper.append(label,meta); link.insertBefore(wrapper,link.lastElementChild); }
+              list.append(link);
+            });
+            categoryDetails.append(list); sectionDetails.append(categoryDetails);
+          });
+          content.append(sectionDetails);
+        });
+      }
+      details.append(content); container.append(details);
     });
+  }
+  function renderLatestFiles() {
+    const container = $('#latestFilesContainer'); container.replaceChildren();
+    const latest = [...files].sort((a,b) => Number(b.id || 0)-Number(a.id || 0)).slice(0,6);
+    if (!latest.length) { empty(container,'لم تُضف ملفات أكاديمية بعد.'); return; }
+    latest.forEach(file => {
+      const link = safeExternalLink(file.file_url,file.title || 'ملف بدون عنوان');
+      link.classList.add('latest-file-link');
+      const meta = make('span','latest-file-meta',`${file.course_name || 'مقرر'} · ${file.type_section || 'عام'} · ${categoryLabels[file.file_category] || file.file_category || 'غير مصنف'}`);
+      const label = link.querySelector('span');
+      if (label) { const wrapper = make('div',''); wrapper.append(label,meta); link.insertBefore(wrapper,link.lastElementChild); }
+      container.append(link);
+    });
+  }
+  function renderAnnouncements() {
+    const container = $('#announcementsContainer'); container.replaceChildren();
+    if (!announcements.length) { empty(container,'لا توجد إعلانات منشورة حاليًا.'); return; }
+    announcements.slice(0,12).forEach(item => {
+      const card = make('article','announcement-card',item.content || 'إعلان');
+      if (item.created_at) {
+        const parsed = new Date(item.created_at);
+        if (!Number.isNaN(parsed.getTime())) card.append(make('time','announcement-date',new Intl.DateTimeFormat('ar-YE',{dateStyle:'medium',timeStyle:'short'}).format(parsed)));
+      }
+      container.append(card);
+    });
+  }
 
-    if (response.ok) {
-        alert("تم رفع بيانات الاختبار القادم إلى السحابة بنجاح!");
-    } else {
-        alert("خطأ في الرفع! تأكدي من إدخال رمز الأمان الصحيح.");
+  async function loadPublicContent() {
+    const semester = encodeURIComponent(currentSemester());
+    const today = localDateString(); const tomorrow = nextLocalDateString(1);
+    $('#todayDateLabel').textContent = formatArabicDate(today); $('#tomorrowDateLabel').textContent = formatArabicDate(tomorrow);
+    const results = await Promise.allSettled([
+      api(`/courses?semester_name=${semester}`), api(`/files?semester_name=${semester}`),
+      api('/announcements'), api('/exam/'), api('/schedule/weekly'),
+      api(`/schedule/daily?agenda_date=${today}`), api(`/schedule/daily?agenda_date=${tomorrow}`)
+    ]);
+    const [courseResult, fileResult, annResult, examResult, weeklyResult, todayResult, tomorrowResult] = results;
+    courses = courseResult.status === 'fulfilled' ? courseResult.value : [];
+    files = fileResult.status === 'fulfilled' ? fileResult.value : [];
+    announcements = annResult.status === 'fulfilled' ? annResult.value : [];
+    renderCourses(); renderLatestFiles(); renderAnnouncements();
+    publicWeeklyLectures = weeklyResult.status === 'fulfilled' ? weeklyResult.value : [];
+    renderPublicWeeklySchedule(weeklyResult.status === 'rejected' ? weeklyResult.reason.message : '');
+    renderDailySchedule(todayResult.status === 'fulfilled' ? todayResult.value : null, '#todayScheduleContainer', todayResult.status === 'rejected' ? todayResult.reason.message : '');
+    tomorrowSchedule = tomorrowResult.status === 'fulfilled' ? tomorrowResult.value : null;
+    renderDailySchedule(tomorrowSchedule, '#agendaContainer', tomorrowResult.status === 'rejected' ? tomorrowResult.reason.message : '');
+    renderExam(examResult.status === 'fulfilled' ? examResult.value : null, examResult.status === 'rejected' ? examResult.reason.message : '');
+    if (courseResult.status === 'rejected' && fileResult.status === 'rejected') empty($('#coursesContainer'), `تعذر تحميل المقررات والملفات. ${courseResult.reason.message}`, true);
+  }
+  let selectedWeeklyReviewDay = (new Date().getDay() + 6) % 7; // API weekday: Monday=0 … Sunday=6.
+  function renderPublicWeeklySchedule(error = '') {
+    const container = $('#weeklyPublicScheduleContainer');
+    const picker = $('#weeklyDayPicker');
+    const count = $('#weeklyLectureCount');
+    container.replaceChildren(); picker.replaceChildren();
+    count.textContent = `${publicWeeklyLectures.length} ${publicWeeklyLectures.length === 1 ? 'محاضرة' : 'محاضرات'}`;
+    if (error) { empty(container, `تعذر تحميل الجدول الأسبوعي: ${error}`, true); return; }
+    if (!publicWeeklyLectures.length) { empty(container, 'لم تتم إضافة محاضرات إلى الجدول الأسبوعي بعد.'); return; }
+    const dayNames = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'];
+    if (selectedWeeklyReviewDay < 0 || selectedWeeklyReviewDay > 6) selectedWeeklyReviewDay = (new Date().getDay() + 6) % 7;
+    for (let day = 0; day < 7; day++) {
+      const dayLectures = publicWeeklyLectures.filter(lecture => Number(lecture.weekday) === day);
+      const button = make('button', 'weekly-day-button');
+      button.type = 'button';
+      button.setAttribute('aria-pressed', String(day === selectedWeeklyReviewDay));
+      button.append(make('span', '', dayNames[day]), make('small', '', `${dayLectures.length} ${dayLectures.length === 1 ? 'محاضرة' : 'محاضرات'}`));
+      button.addEventListener('click', () => { selectedWeeklyReviewDay = day; renderPublicWeeklySchedule(); });
+      picker.append(button);
     }
+    const dayLectures = publicWeeklyLectures.filter(lecture => Number(lecture.weekday) === selectedWeeklyReviewDay)
+      .slice().sort((a,b) => (a.start_time || '99:99').localeCompare(b.start_time || '99:99'));
+    if (!dayLectures.length) { empty(container, `لا توجد محاضرات ثابتة يوم ${dayNames[selectedWeeklyReviewDay]}.`); return; }
+    const group = make('section', 'weekly-public-day');
+    group.append(make('h3', 'schedule-day', `${dayNames[selectedWeeklyReviewDay]} · ${dayLectures.length} ${dayLectures.length === 1 ? 'محاضرة' : 'محاضرات'}`));
+    const list = make('div', 'timeline');
+    dayLectures.forEach(lecture => {
+      const card = make('article', 'timeline-card');
+      const timeText = lecture.start_time ? `${lecture.start_time}${lecture.end_time ? ' – ' + lecture.end_time : ''}` : 'بدون وقت';
+      card.append(make('div', 'timeline-time', timeText));
+      const details = make('div', '');
+      details.append(make('div', 'timeline-title', lecture.title || 'محاضرة'));
+      const meta = make('div', 'timeline-meta');
+      if (lecture.location) meta.append(make('span', '', `📍 ${lecture.location}`));
+      if (lecture.notes) meta.append(make('span', '', `✦ ${lecture.notes}`));
+      if (meta.childElementCount) details.append(meta);
+      card.append(details); list.append(card);
+    });
+    group.append(list); container.append(group);
+  }
+  function renderDailySchedule(item, selector, error = '') {
+    const container = $(selector); container.replaceChildren();
+    if (error) { empty(container, error, true); return; }
+    if (!item) { empty(container, 'تعذر تحميل الجدول. تحقق من الاتصال ثم أعد المحاولة.', true); return; }
+    if (!item.in_semester) { empty(container, 'هذا التاريخ خارج فترة الفصل الدراسي المحددة.'); return; }
+    if (item.is_override) container.append(make('div','tag','تم تطبيق استثناء خاص بهذا اليوم'));
+    (item.lectures || []).forEach((lecture, index) => {
+      const card = make('article','timeline-card');
+      const timeText = lecture.start_time ? `${lecture.start_time}${lecture.end_time ? ' – '+lecture.end_time : ''}` : 'بدون وقت';
+      card.append(make('div','timeline-time',timeText));
+      const main = make('div',''); main.append(make('div','timeline-title',lecture.title || 'محاضرة'));
+      const meta = make('div','timeline-meta');
+      if (lecture.location) meta.append(make('span','',`📍 ${lecture.location}`));
+      if (lecture.notes) meta.append(make('span','',`✦ ${lecture.notes}`));
+      if (meta.childElementCount) main.append(meta);
+      card.append(main); container.append(card);
+    });
+    if (item.note) container.append(make('div','timeline-note',`📝 ${item.note}`));
+    if (!(item.lectures || []).length && !item.note) empty(container, 'لا توجد محاضرات مسجلة لهذا اليوم.');
+  }
+  function renderExam(item, error = '') {
+    const container = $('#examContainer'); container.replaceChildren(); if (examTimer) clearInterval(examTimer);
+    if (error) { empty(container, error, true); return; }
+    if (!item) { empty(container, 'لم تُنشر بيانات اختبار قادم بعد.'); return; }
+    container.append(make('div','exam-title',item.course_name), make('div','small muted',`التاريخ: ${item.exam_date_text}`), make('div','small muted',`الوقت: ${item.exam_time}`));
+    const countdown = make('div','tag',''); container.append(countdown);
+    const update = () => { const time = new Date(item.timestamp).getTime(); if (!Number.isFinite(time)) { countdown.textContent = 'موعد الاختبار'; return; } const diff = time - Date.now(); if (diff <= 0) { countdown.textContent = 'حان الموعد أو انتهى'; if (examTimer) clearInterval(examTimer); return; } const days = Math.floor(diff / 86400000); const hours = Math.floor((diff % 86400000) / 3600000); const mins = Math.floor((diff % 3600000) / 60000); countdown.textContent = `متبقٍ ${days} يوم · ${hours} ساعة · ${mins} دقيقة`; };
+    update(); examTimer = setInterval(update, 60000);
+  }
+  async function reloadEverything() { $('#reloadBtn').disabled = true; $('#reloadBtn').textContent = 'جارٍ التحديث…'; try { await loadSemesters(); await loadPublicContent(); } finally { $('#reloadBtn').disabled = false; $('#reloadBtn').textContent = '↻ إعادة تحميل المحتوى'; } }
+
+  function openAdmin() { $('#adminModal').classList.add('open'); if (adminToken) { loadAnalyticsStats(); return; } $('#adminTokenInput').focus(); }
+  function closeAdmin() { $('#adminModal').classList.remove('open'); }
+  async function login(event) {
+    event.preventDefault(); const input = $('#adminTokenInput'); const proposed = input.value.trim();
+    if (!proposed) return;
+    const previous = adminToken; adminToken = proposed;
+    try { await api('/admin/online_count'); $('#adminLogin').classList.add('hidden'); $('#adminWorkspace').classList.remove('hidden'); input.value = ''; showStatus('تم التحقق من صلاحيات الإدارة.'); await refreshAdmin(); }
+    catch (e) { adminToken = ''; alert(e.message); }
+  }
+  function logout() { adminToken = ''; grades = []; $('#adminWorkspace').classList.add('hidden'); $('#adminLogin').classList.remove('hidden'); $('#adminTokenInput').value = ''; $('#adminStatus').className = 'status'; }
+  async function refreshAdmin() {
+    try {
+      await loadSemesters();
+      const semester = encodeURIComponent(currentSemester());
+      const results = await Promise.all([api('/semesters'), api(`/courses?semester_name=${semester}`), api(`/files?semester_name=${semester}`), api('/announcements'), api('/grades'), api('/admin/online_count'), api('/agenda/'), api('/exam/'), api('/admin/archive'), api('/schedule/weekly'), api('/schedule/settings'), api(`/schedule/daily?agenda_date=${nextLocalDateString(1)}`)]);
+      semesters = results[0]; allAdminCourses = results[1]; const adminFiles = results[2]; const adminAnnouncements = results[3]; grades = results[4]; weeklyLectures = results[9];
+      $('#onlineCount').textContent = `المتصلون حاليًا: ${results[5].count}`;
+      renderSemesterAdmin(semesters); renderCourseAdmin(allAdminCourses); renderFileAdmin(adminFiles); renderAnnouncementAdmin(adminAnnouncements); renderGradeAdmin(); renderArchiveAdmin(results[8]); fillCourseChoice(); fillExistingForms(results[6], results[7]);
+      renderWeeklyScheduleAdmin(); fillScheduleSettings(results[10]); fillOverrideForm(results[11]);
+      await loadAnalyticsStats();
+    } catch (e) { showStatus(e.message, true); }
+  }
+  function adminItem(title, subtitle, actions) {
+    const item = make('div','admin-item'); const main = make('div','admin-item-main'); main.append(make('strong','',title)); if (subtitle) main.append(make('div','small muted',subtitle));
+    const buttons = make('div','admin-item-actions'); actions.forEach(a => { const b = make('button',`btn btn-sm${a.danger?' btn-danger':''}`,a.label); b.type='button'; b.addEventListener('click',a.onClick); buttons.append(b); }); item.append(main,buttons); return item;
+  }
+  function fillScheduleSettings(settings) {
+    if (!settings) return;
+    $('#scheduleStart').value = settings.semester_start || '';
+    $('#scheduleEnd').value = settings.semester_end || '';
+  }
+  function fillOverrideForm(schedule) {
+    const dateInput = $('#overrideDate');
+    dateInput.value = schedule?.date || nextLocalDateString(1);
+    overrideDaySchedule = schedule;
+    const select = $('#overrideLectureSelect'); const selected = select.value;
+    select.replaceChildren(new Option('بدون تعديل محاضرة',''));
+    (schedule?.lectures || []).forEach(lecture => select.add(new Option(`${lecture.start_time || 'بلا وقت'} · ${lecture.title}`, String(lecture.weekly_lecture_id))));
+    if ([...select.options].some(o=>o.value===selected)) select.value=selected;
+    const chosen = (schedule?.lectures || []).find(x=>String(x.weekly_lecture_id)===select.value);
+    const form = $('#scheduleOverrideForm');
+    if (chosen) { form.elements.title.value=chosen.title||''; form.elements.start_time.value=chosen.start_time||''; form.elements.end_time.value=chosen.end_time||''; form.elements.location.value=chosen.location||''; }
+  }
+  function renderWeeklyScheduleAdmin() {
+    const container = $('#weeklyScheduleAdminList'); container.replaceChildren();
+    if (!weeklyLectures.length) { empty(container,'لم تتم إضافة محاضرات للجدول الأسبوعي بعد.'); return; }
+    for (let day=0; day<7; day++) {
+      const dayItems=weeklyLectures.filter(x=>x.weekday===day); if(!dayItems.length) continue;
+      container.append(make('div','schedule-day', ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'][day]));
+      dayItems.forEach(lecture=>container.append(adminItem(lecture.title,`${lecture.start_time||'—'}${lecture.end_time?' – '+lecture.end_time:''}${lecture.location?' · 📍 '+lecture.location:''}${lecture.notes?' · ✦ '+lecture.notes:''}`,[
+        {label:'تعديل',onClick:async()=>{const title=prompt('اسم المحاضرة',lecture.title);if(!title)return;const start_time=prompt('وقت البداية (HH:MM)',lecture.start_time||'')??lecture.start_time;const end_time=prompt('وقت النهاية (HH:MM)',lecture.end_time||'')??lecture.end_time;const location=prompt('المكان',lecture.location||'')??lecture.location;const notes=prompt('ملاحظة',lecture.notes||'')??lecture.notes;try{await api(`/schedule/weekly/${lecture.id}`,{method:'PATCH',body:JSON.stringify({weekday:lecture.weekday,title,start_time,end_time,location,notes})});showStatus('تم تحديث المحاضرة الأسبوعية.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}},
+        {label:'أرشفة',danger:true,onClick:async()=>{if(!confirm(`إزالة «${lecture.title}» من الجدول المتكرر؟`))return;try{await api(`/schedule/weekly/${lecture.id}`,{method:'DELETE'});showStatus('تمت إزالة المحاضرة من الجدول المتكرر دون حذف السجلات السابقة.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}}
+      ])));
     }
+  }
+  function renderSemesterAdmin(items) {
 
-    // دالة الرادار: جرد وسحب قائمة المتصلين حالياً وعرضها في الجدول المخصص
-    async function loadAdminStudents() {
-        const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
-        
-        try {
-            const res = await fetch(`${BASE_URL}/admin/online_count`);
-            if(res.ok) {
-                const data = await res.json();
-                const listContainer = document.getElementById("adminStudentsList");
-                
-                if(listContainer) {
-                    listContainer.innerHTML = "";
-                    
-                    // التأكد من وجود متصلين حالياً
-                    if (data.count > 0 && data.details) {
-                        data.details.forEach((device, index) => {
-                            listContainer.innerHTML += `
-                                <tr class="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors">
-                                    <!-- العمود الأول: اسم الزائر ونوع الجهاز -->
-                                    <td class="py-3 px-2 text-white font-medium">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-user-secret text-indigo-400"></i>
-                                            <div>
-                                                <span class="block">زائر متخفي #${index + 1}</span>
-                                                <span class="text-xs text-slate-400 font-normal"><i class="fa-solid fa-mobile-screen text-slate-500 ml-1"></i> ${device}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    
-                                    <!-- العمود الثاني: حالة الاتصال بدلاً من زر الحذف -->
-                                    <td class="py-3 px-2 text-center">
-                                        <span class="inline-flex items-center justify-center bg-emerald-950 border border-emerald-800 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                            <i class="fa-solid fa-circle-dot animate-pulse ml-1"></i> متصل الآن
-                                        </span>
-                                    </td>
-                                </tr>`;
-                        });
-                    } else {
-                        // إذا كان الموقع فارغاً
-                        listContainer.innerHTML = `
-                            <tr>
-                                <td colspan="2" class="py-6 text-center text-slate-500 italic">
-                                    <i class="fa-solid fa-radar fa-spin text-2xl block mb-2 opacity-50"></i>
-                                    الرادار هادئ.. لا يوجد طلاب متصلين بالنظام حالياً.
-                                </td>
-                            </tr>`;
-                    }
-                }
-            }
-        } catch (e) {
-            console.log("حدث خطأ في تشغيل الرادار:", e);
-        }
+    const c = $('#semesterAdminList'); c.replaceChildren(); items.forEach(s => c.append(adminItem(s.name, s.academic_year || 'بدون عام دراسي', [
+      {label:'تعديل',onClick:async()=>{const name=prompt('اسم الفصل',s.name);if(!name)return;const year=prompt('العام الدراسي',s.academic_year||'')||'';try{await api(`/semesters/${s.id}`,{method:'PATCH',body:JSON.stringify({name,academic_year:year})});showStatus('تم تحديث الفصل.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}},
+      {label:'أرشفة',danger:true,onClick:async()=>{if(!confirm(`أرشفة ${s.name}؟ ستبقى بياناته محفوظة.`))return;try{await api(`/semesters/${s.id}/archive`,{method:'POST'});showStatus('تمت الأرشفة دون حذف البيانات.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}}
+    ])));
+  }
+  function renderCourseAdmin(items) {
+    const c=$('#courseAdminList'); c.replaceChildren(); items.forEach(course=>{const semesterName=semesters.find(s=>s.id===course.semester_id)?.name || currentSemester(); c.append(adminItem(course.name,course.professor||semesterName,[
+      {label:'تعديل',onClick:async()=>{const name=prompt('اسم المقرر',course.name);if(!name)return;const professor=prompt('اسم المحاضر',course.professor||'')||'';const semester_name=prompt('اسم الفصل الدراسي',semesterName)||semesterName;const has_practical=confirm('هل يحتوي المقرر على قسم عملي؟');try{await api(`/courses/${course.id}`,{method:'PATCH',body:JSON.stringify({name,professor,semester_name,has_practical})});showStatus('تم تحديث المقرر.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}},
+      {label:'أرشفة',danger:true,onClick:async()=>{if(!confirm(`أرشفة المقرر ${course.name}؟`))return;try{await api(`/courses/${course.id}/archive`,{method:'POST'});showStatus('تمت أرشفة المقرر مع إبقاء سجلاته.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}}
+    ]));});
+  }
+  function renderFileAdmin(items) {
+    const c=$('#fileAdminList'); c.replaceChildren(); items.slice(0,25).forEach(f=>c.append(adminItem(f.title,`${f.course_name} · ${f.type_section} · ${f.file_category}`,[
+      {label:'تعديل',onClick:async()=>{const title=prompt('عنوان الملف',f.title);if(!title)return;const file_url=prompt('رابط الملف',f.file_url);if(!file_url)return;const course_name=prompt('اسم المقرر',f.course_name)||f.course_name;const type_section=prompt('القسم: نظري / عملي / عام',f.type_section)||f.type_section;const file_category=prompt('التصنيف',f.file_category)||f.file_category;try{await api(`/files/${f.id}`,{method:'PATCH',body:JSON.stringify({title,file_url,course_name,type_section,file_category,semester_name:f.semester_name||currentSemester()})});showStatus('تم تحديث بيانات الملف.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}},
+      {label:'أرشفة',danger:true,onClick:async()=>{if(!confirm(`أرشفة الملف ${f.title}؟`))return;try{await api(`/files/${f.id}/archive`,{method:'POST'});showStatus('تمت أرشفة الملف دون حذف السجل.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}}
+    ])));
+  }
+  function renderAnnouncementAdmin(items) {
+    const c=$('#announcementAdminList');c.replaceChildren();items.slice(0,20).forEach(a=>c.append(adminItem(a.content,`رقم ${a.id}`,[
+      {label:'تعديل',onClick:async()=>{const content=prompt('نص الإعلان',a.content);if(!content)return;try{await api(`/announcements/${a.id}`,{method:'PATCH',body:JSON.stringify({content})});showStatus('تم تحديث الإعلان.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}},
+      {label:'أرشفة',danger:true,onClick:async()=>{if(!confirm('أرشفة هذا الإعلان؟'))return;try{await api(`/announcements/${a.id}/archive`,{method:'POST'});showStatus('تمت أرشفة الإعلان.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}}}
+    ])));
+  }
+  function renderGradeAdmin() {
+    const c=$('#gradeAdminList');c.replaceChildren(); if(!grades.length){empty(c,'لا توجد سجلات درجات محفوظة.');return;}
+    grades.forEach(g=>c.append(adminItem(`${g.student_name} — ${g.course_name}`,`النظري: ${g.theory_grade ?? 0} · العملي: ${g.practical_grade ?? 0}`,[
+      {label:'تعديل',onClick:async()=>{const student_name=prompt('اسم الطالب',g.student_name);if(!student_name)return;const course_name=prompt('المقرر',g.course_name)||g.course_name;const theory_grade=Number(prompt('درجة النظري',g.theory_grade)||0);const practical_grade=Number(prompt('درجة العملي',g.practical_grade)||0);try{await api(`/grades/${g.id}`,{method:'PATCH',body:JSON.stringify({student_name,course_name,theory_grade,practical_grade})});showStatus('تم تحديث سجل الدرجة.');await refreshAdmin();}catch(e){showStatus(e.message,true);}}},
+      {label:'حذف',danger:true,onClick:async()=>{if(!confirm(`حذف سجل درجات ${g.student_name}؟`))return;try{await api(`/admin/students/${g.id}`,{method:'DELETE'});showStatus('تم حذف سجل الدرجة.');await refreshAdmin();}catch(e){showStatus(e.message,true);}}}
+    ])));
+  }
+  function renderArchiveAdmin(data) {
+    const c = $('#archiveAdminList'); c.replaceChildren();
+    const groups = [
+      ...(data.semesters || []).map(x => ({kind:'semester', id:x.id, title:x.name, subtitle:'فصل دراسي'})),
+      ...(data.courses || []).map(x => ({kind:'course', id:x.id, title:x.name, subtitle:'مقرر'})),
+      ...(data.files || []).map(x => ({kind:'file', id:x.id, title:x.title, subtitle:`${x.course_name} · ${x.semester_name}`})),
+      ...(data.announcements || []).map(x => ({kind:'announcement', id:x.id, title:x.content, subtitle:'إعلان'}))
+    ];
+    if (!groups.length) { empty(c, 'الأرشيف فارغ حاليًا.'); return; }
+    groups.forEach(x => c.append(adminItem(x.title, x.subtitle, [{label:'استعادة', onClick:async()=>{
+      if (!confirm(`استعادة «${x.title}»؟`)) return;
+      try { await api(`/admin/archive/${x.kind}/${x.id}/restore`, {method:'POST'}); showStatus('تمت استعادة العنصر.'); await refreshAdmin(); await reloadEverything(); }
+      catch(e) { showStatus(e.message, true); }
+    }}])));
+  }
+  async function loadArchiveOnly() { try { renderArchiveAdmin(await api('/admin/archive')); } catch(e) { showStatus(e.message, true); } }
+  function fillCourseChoice() { const select=$('#fileCourseChoice');const old=select.value;select.replaceChildren(...allAdminCourses.map(c=>new Option(c.name,c.name)));if(old&&allAdminCourses.some(c=>c.name===old))select.value=old; if(!allAdminCourses.length)select.add(new Option('أضف مقررًا أولًا','')); }
+  function fillExistingForms(agenda, exam) {
+    const a=$('#agendaForm'); if(agenda) ['lecture_1','time_1','lecture_2','time_2','status_msg'].forEach(k=>a.elements[k].value=agenda[k]||'');
+    const e=$('#examForm'); if(exam) ['course_name','exam_date_text','exam_time','timestamp'].forEach(k=>{if(e.elements[k])e.elements[k].value=k==='timestamp'?(exam[k]||'').slice(0,16):exam[k]||'';});
+  }
+  function formObject(form) { const data=new FormData(form); const obj={}; for(const [key,value] of data.entries()) obj[key]=typeof value==='string'?value.trim():value; const checkbox=form.querySelector('input[type=checkbox]');if(checkbox)obj[checkbox.name]=checkbox.checked; return obj; }
+  function bindForm(id, path, after, transform = x => x) {
+    $(id).addEventListener('submit', async event=>{event.preventDefault();const form=event.currentTarget;try{await api(path,{method:'POST',body:JSON.stringify(transform(formObject(form)))});form.reset();$$('.semesterChoices').forEach(select=>{if(semesters.some(s=>s.name===currentSemester()))select.value=currentSemester();});showStatus('تم الحفظ بنجاح.');if(after)await after();await loadSemesters();await loadPublicContent();}catch(e){showStatus(e.message,true);}});
+  }
+  $('#weeklyLectureForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget;const data=formObject(form);data.weekday=Number(data.weekday);try{await api('/schedule/weekly',{method:'POST',body:JSON.stringify(data)});form.reset();showStatus('أُضيفت المحاضرة إلى الجدول الأسبوعي الدائم.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}});
+  $('#scheduleSettingsForm').addEventListener('submit',async event=>{event.preventDefault();const data=formObject(event.currentTarget);try{await api('/schedule/settings',{method:'PUT',body:JSON.stringify(data)});showStatus('تم حفظ فترة الفصل الدراسي.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}});
+  $('#scheduleOverrideForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget;const data=formObject(form);const selectedId=Number(data.lecture_select || $('#overrideLectureSelect').value || 0);const lecture_updates=[];const selected=$('#overrideLectureSelect').value; if(selected){const update={weekly_lecture_id:Number(selected)};for(const key of ['title','start_time','end_time','location']) if(data[key]) update[key]=data[key];lecture_updates.push(update);}try{await api('/schedule/overrides',{method:'POST',body:JSON.stringify({agenda_date:data.agenda_date,note:data.note||'',lecture_updates})});showStatus('تم حفظ استثناء هذا التاريخ فقط.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}});
+  $('#overrideDate').addEventListener('change',async()=>{try{const day=await api(`/schedule/daily?agenda_date=${encodeURIComponent($('#overrideDate').value)}`);fillOverrideForm(day);const sel=$('#overrideLectureSelect').value;const lecture=(day.lectures||[]).find(x=>String(x.weekly_lecture_id)===sel);if(lecture){const f=$('#scheduleOverrideForm');f.elements.title.value=lecture.title||'';f.elements.start_time.value=lecture.start_time||'';f.elements.end_time.value=lecture.end_time||'';f.elements.location.value=lecture.location||'';}}catch(e){showStatus(e.message,true);}});
+  $('#overrideLectureSelect').addEventListener('change',()=>{const id=Number($('#overrideLectureSelect').value);const lecture=(overrideDaySchedule?.lectures||[]).find(x=>x.weekly_lecture_id===id);const form=$('#scheduleOverrideForm');form.elements.title.value=lecture?.title||'';form.elements.start_time.value=lecture?.start_time||'';form.elements.end_time.value=lecture?.end_time||'';form.elements.location.value=lecture?.location||'';});
+  $('#clearOverrideBtn').addEventListener('click',async()=>{const d=$('#overrideDate').value;if(!d)return;if(!confirm('إلغاء الاستثناء وإعادة الجدول الأسبوعي الأصلي لهذا التاريخ؟'))return;try{await api(`/schedule/overrides/${encodeURIComponent(d)}`,{method:'DELETE'});showStatus('أُلغي الاستثناء وعاد الجدول الأسبوعي لهذا التاريخ.');await refreshAdmin();await reloadEverything();}catch(e){showStatus(e.message,true);}});
+  bindForm('#semesterForm','/semesters',refreshAdmin);
+  bindForm('#courseForm','/courses',refreshAdmin);
+  bindForm('#fileForm','/files',refreshAdmin);
+  bindForm('#announcementForm','/announcements',refreshAdmin);
+  bindForm('#agendaForm','/agenda/',refreshAdmin);
+  bindForm('#examForm','/exam/',refreshAdmin);
+  bindForm('#gradeForm','/grades',refreshAdmin,x=>({...x,theory_grade:Number(x.theory_grade),practical_grade:Number(x.practical_grade)}));
+
+  $('#adminOpenBtn').addEventListener('click',openAdmin); $('#adminCloseBtn').addEventListener('click',closeAdmin);
+  $('#adminModal').addEventListener('click',e=>{if(e.target===$('#adminModal'))closeAdmin();});
+  $('#adminLoginForm').addEventListener('submit',login); $('#logoutBtn').addEventListener('click',logout); $('#refreshAdminBtn').addEventListener('click',refreshAdmin); $('#loadArchiveBtn').addEventListener('click',loadArchiveOnly);
+  $('#semesterFilter').addEventListener('change',async()=>{syncSemesterRoute();await loadPublicContent();if(adminToken)await refreshAdmin();});
+  $('#categoryFilter').addEventListener('change',renderCourses); $('#searchInput').addEventListener('input',renderCourses);
+  $('#reloadBtn').addEventListener('click',reloadEverything);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAdmin();});
+
+  function renderAnalyticsStats(data) {
+    if (!data) return;
+    const format = value => new Intl.NumberFormat('ar-YE').format(Number(value) || 0);
+    const values = {
+      adminAnalyticsUniqueUsers: data.total_unique_users,
+      adminAnalyticsTodayActive: data.today_active_users,
+      adminAnalyticsTotalVisits: data.total_visits,
+    };
+    Object.entries(values).forEach(([id, value]) => { const node = document.getElementById(id); if (node) node.textContent = format(value); });
+    const updated = $('#analyticsAdminUpdated');
+    if (updated) updated.textContent = `آخر تحديث: ${new Intl.DateTimeFormat('ar-YE',{hour:'2-digit',minute:'2-digit'}).format(new Date())}`;
+  }
+  async function loadAnalyticsStats() {
+    if (!adminToken || $('#adminWorkspace').classList.contains('hidden') || !$('#adminModal').classList.contains('open')) return;
+    try {
+      const stats = await api(`/analytics/stats?local_date=${encodeURIComponent(localDateString())}`);
+      renderAnalyticsStats(stats);
+    } catch (_) {
+      ['adminAnalyticsUniqueUsers','adminAnalyticsTodayActive','adminAnalyticsTotalVisits'].forEach(id => {
+        const node = document.getElementById(id); if (node && node.textContent === '—') node.textContent = 'غير متاح';
+      });
     }
- // .....
-        async function loadAllFiles() {
-            const res = await fetch(`${API_URL}/files`);
-            const data = await res.json();
-            renderCourses(data);
-            const latestContainer = document.getElementById("latestFilesContainer");
-            if (data.length > 0) {
-                latestContainer.innerHTML = "";
-                data.slice(0, 5).forEach(f => {
-                    latestContainer.innerHTML += `
-                        <div class="p-2 bg-slate-900 rounded-xl border border-slate-800">
-                            <span class="text-slate-200 block font-medium mb-0.5">${f.title}</span>
-                            <span class="text-slate-500 block text-xxs">${f.course_name}</span>
-                        </div>`;
-                });
-            }
-        }
-
-        async function submitAnnouncement() {
-            const text = document.getElementById("annInput").value;
-            if (!text) return;
-            await fetch(`${API_URL}/announcements?content=${encodeURIComponent(text)}`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${adminToken}` }
-            });
-            document.getElementById("annInput").value = "";
-            loadAnnouncements();
-            alert("تم نشر الإعلان وتعميمه وتحديث شريط الطوارئ بنجاح!");
-        }
-
-        async function submitFile() {
-            const course = document.getElementById("fileCourse").value;
-            const sec = document.getElementById("fileSection").value;
-            const cat = document.getElementById("fileCategory").value;
-            const title = document.getElementById("fileTitle").value;
-            const url = document.getElementById("fileUrl").value;
-            if (!title || !url) { alert("أكمل البيانات أولاً"); return; }
-
-            await fetch(`${API_URL}/files?course_name=${encodeURIComponent(course)}&type_section=${encodeURIComponent(sec)}&file_category=${encodeURIComponent(cat)}&title=${encodeURIComponent(title)}&file_url=${encodeURIComponent(url)}`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${adminToken}` }
-            });
-            alert("تم رفع وتعميم الملف فوراً بنجاح!");
-            loadAllFiles();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            renderCourses();
-            loadAnnouncements();
-            loadAllFiles();
-            loadGrades();
-        });
-        
- 
-        document.addEventListener("DOMContentLoaded", async function() {
-            const BASE_URL = "https://eduhub-backend-je8q.onrender.com";
-
-            // 1. جلب بيانات الأجندة
-            try {
-                const res = await fetch(`${BASE_URL}/agenda/`);
-                if(res.ok) {
-                    const agenda = await res.json();
-                    const container = document.getElementById('agenda-container');
-                    if(agenda && container) {
-                        let htmlContent = '';
-                        
-                        if (agenda.lecture_1) {
-                            htmlContent += `<li class="flex justify-between border-b border-slate-800 pb-2"><span class="text-white"><i class="fa-solid fa-laptop-code text-blue-400"></i> ${agenda.lecture_1}</span> <span class="text-slate-400">${agenda.time_1}</span></li>`;
-                        }
-                        if (agenda.lecture_2) {
-                            htmlContent += `<li class="flex justify-between border-b border-slate-800 pb-2"><span class="text-white"><i class="fa-solid fa-globe text-blue-400"></i> ${agenda.lecture_2}</span> <span class="text-slate-400">${agenda.time_2}</span></li>`;
-                        }
-                        if (agenda.status_msg) {
-                            htmlContent += `<li class="text-slate-500 italic mt-2"><i class="fa-solid fa-circle-info"></i> ${agenda.status_msg}</li>`;
-                        }
-                        
-                        // إذا لم يتم كتابة أي شيء في الأجندة
-                        if(htmlContent === '') {
-                            htmlContent = `<li class="text-slate-500 italic"><i class="fa-solid fa-circle-info"></i> لا توجد بيانات مسجلة لجدول الغد.</li>`;
-                        }
-                        
-                        container.innerHTML = htmlContent;
-                    }
-                }
-            } catch(e) { console.log("خطأ في جلب الأجندة:", e); }
-
-            // 2. جلب بيانات الاختبار مع المؤقت التنازلي
-            try {
-                const res = await fetch(`${BASE_URL}/exam/`);
-                if(res.ok) {
-                    const exam = await res.json();
-                    const container = document.getElementById('exam-container');
-                    if(exam && container) {
-                        container.innerHTML = `
-                            <h4 class="text-emerald-400 font-bold mb-2">${exam.course_name}</h4>
-                            <p class="flex gap-2 items-center"><i class="fa-regular fa-calendar text-slate-400"></i> ${exam.exam_date_text}</p>
-                            <p class="flex gap-2 items-center"><i class="fa-regular fa-clock text-slate-400"></i> ${exam.exam_time}</p>
-                            <p id="time-left-msg" class="text-orange-400 text-xs mt-3 font-bold"></p>
-                        `;
-
-                        // تشغيل المؤقت التنازلي
-                        if(exam.timestamp) {
-                            const examDate = new Date(exam.timestamp).getTime();
-                            const timerInterval = setInterval(() => {
-                                const now = new Date().getTime();
-                                const distance = examDate - now;
-                                const msgElement = document.getElementById("time-left-msg");
-
-                                if(msgElement) {
-                                    if (distance < 0) {
-                                        clearInterval(timerInterval);
-                                        msgElement.innerText = "انتهى وقت الاختبار، بالتوفيق للجميع!";
-                                        msgElement.className = "text-slate-500 text-xs mt-3 font-bold";
-                                    } else {
-                                        const daysLeft = Math.floor(distance / (1000 * 60 * 60 * 24));
-                                        const hoursLeft = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                        
-                                        if (daysLeft === 0) {
-                                            msgElement.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> تنبيه: متبقي أقل من 24 ساعة!`;
-                                            msgElement.className = "text-red-500 text-xs mt-3 font-bold animate-pulse";
-                                        } else {
-                                            msgElement.innerText = `متبقي: ${daysLeft} أيام و ${hoursLeft} ساعات`;
-                                        }
-                                    }
-                                }
-                            }, 1000);
-                        }
-                    }
-                }
-            } catch(e) { console.log("خطأ في جلب الاختبار:", e); }
-        });
-
-        // دالة التحكم في نافذة التواصل
-        function toggleContactModal() {
-            const modal = document.getElementById('contactModal');
-            const content = document.getElementById('contactModalContent');
-            
-            if (modal.classList.contains('hidden')) {
-                // أوامر فتح النافذة
-                modal.classList.remove('hidden');
-                modal.classList.add('flex'); // لضمان التوسيط
-                
-                // تأخير زمني بسيط جداً لتفعيل تأثير الدخول (Animation)
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    content.classList.remove('scale-95');
-                    content.classList.add('scale-100');
-                }, 10);
-            } else {
-                // أوامر إغلاق النافذة بتأثير الخروج
-                modal.classList.add('opacity-0');
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-                
-                // إخفاء العنصر تماماً بعد انتهاء تأثير الخروج
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }, 300);
-            }
-        }
-
-    
-        // دالة صامتة تعمل في الخلفية لتسجيل تواجد الطالب كل 30 ثانية
-        function reportPresence() {
-            fetch('https://eduhub-backend-je8q.onrender.com/presence', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                student_id: navigator.userAgent, // استخدام بصمة الجهاز كمعرف مؤقت أو معرف الطالب إذا كان تسجيل الدخول مفعلاً
-                status: 'active',
-                timestamp: new Date().toISOString()
-            })
-            })
-            .then(response => {
-            // لا نقوم بإظهار أي تنبيه للمستخدم، العملية تتم بصمت تام
-            })
-            .catch(error => {
-            // تجاهل الأخطاء بصمت لكي لا تتأثر تجربة المستخدم
-            });
-        }
-
-        // إرسال أول إشارة فور فتح الصفحة
-        window.addEventListener('load', () => {
-            reportPresence();
-            // تحديث الإشارة كل 30 ثانية ليظل الرادار يعلم أنه ما زال متصلاً
-            setInterval(reportPresence, 30000);
-        });
+  }
+  async function sendAnalyticsHeartbeat() {
+    if (analyticsHeartbeatBusy || document.visibilityState !== 'visible') return;
+    analyticsHeartbeatBusy = true;
+    try {
+      await api('/analytics/track', {method:'POST', body:JSON.stringify({device_id:analyticsDeviceId, session_id:analyticsSessionId, local_date:localDateString()})});
+    } catch (_) { /* Analytics failure must never block academic content. */ }
+    finally { analyticsHeartbeatBusy = false; }
+  }
+  function reportPresence() {
+    if (document.visibilityState !== 'visible') return;
+    sendAnalyticsHeartbeat();
+  }
+  document.addEventListener('visibilitychange',reportPresence);
+  reportPresence();
+  setInterval(reportPresence,45000);
+  setInterval(loadAnalyticsStats,30000);
+  reloadEverything(); reportPresence();
+  let observedLocalDate = localDateString();
+  setInterval(() => { const nowDate = localDateString(); if (nowDate !== observedLocalDate) { observedLocalDate = nowDate; loadPublicContent().catch(error => { empty($('#todayScheduleContainer'), error.message, true); empty($('#agendaContainer'), error.message, true); }); } }, 60000);
+})();
 </script>
 </body>
-</html>
-</script>
-        
-    </script>
-</body>
-
 </html>
